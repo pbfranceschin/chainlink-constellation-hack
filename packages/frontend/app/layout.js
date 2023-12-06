@@ -1,34 +1,11 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { WagmiConfig, createConfig, configureChains, polygonMumbai } from '@wagmi/core';
-import { publicProvider } from '@wagmi/core/providers/public';
-import { infuraProvider } from '@wagmi/core/providers/infura';
+// import { WagmiConfig, createConfig, configureChains, polygonMumbai } from '@wagmi/core';
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-
+import { Providers } from './providers'
+ 
 const inter = Inter({ subsets: ['latin'] });
 
-const WALLET_CONNECT_ID = process.env.WALLET_CONNECT_ID;
-const INFURA_API_KEY = process.env.INFURA_API_KEY;
-
-const { publicClient, webSocketPublicClient } = configureChains(
-  [polygonMumbai],
-  // [infuraProvider({ apiKey: INFURA_API_KEY })],
-  [publicProvider()],
-);
-
-const { connectors } = getDefaultWallets({
-  appName: 'Yield Leagues',
-  projectId: WALLET_CONNECT_ID,
-  chains
-});
-
-const config = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-  webSocketPublicClient,
-});
 
 export const metadata = {
   title: 'Create Next App',
@@ -37,12 +14,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <WagmiConfig config={config}>
-      <RainbowKitProvider chains={chains}>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   )
 }
