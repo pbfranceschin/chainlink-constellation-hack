@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 225, 225, 225;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: rgb(var(--background-rgb));
+  font-size: 100%;
+}
+
+/* Style the scrollbar track */
+.custom-scrollbar::-webkit-scrollbar {
+  @apply w-2 bg-gray-200 rounded; /* Width of the scrollbar */
+}
+
+/* Style the scrollbar thumb */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded; /* Color and rounded corners of the scrollbar thumb */
+}
+
+/* Optional: Style the scrollbar thumb on hover */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500; /* Darker color on hover */
+}
+
+/* Always reserve space for the scrollbar */
+.scrollable-body-content {
+  padding-right: 48px; /* 40px + 8px Adjust based on the average scrollbar width */
+}
+
+/* Reduce padding by the scrollbar's width when the scrollbar is present */
+.scrollable-body-content.has-scrollbar {
+  padding-right: 40px;
+}
