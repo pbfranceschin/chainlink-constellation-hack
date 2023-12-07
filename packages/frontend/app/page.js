@@ -11,6 +11,8 @@ import EditIcon from "./components/EditIcon";
 import Modal from './components/Modal';
 import { useState } from "react";
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
+import { useTVL, useTotalYield } from "./hooks/pool";
+import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 
 
  /* Initial Data */
@@ -100,6 +102,11 @@ export default function Home() {
     })
     return currentUserDepositAmount
   }
+  const tvl = useTVL();
+  const totalYield = useTotalYield(mumbaiUSDCPool);
+
+  console.log('tvl',tvl);
+  console.log('totalYield', totalYield);
 
   /* Variables */
   const daysLeft = getDaysLeft();

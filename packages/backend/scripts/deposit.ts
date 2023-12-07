@@ -36,13 +36,13 @@ const main = async(outcome:number, amount: number) => {
   console.log('===========');
   console.log(receipt.logs);
 //   
-  console.log(`\nchecking stake...\n`);
+  console.log(`\nchecking stake...`);
   const stake = await pool.getStake(signer.address, outcome);
   console.log(`stake = ${stake.toString()}, valid? ${stake == BigInt(amount)}`);
 //   
   console.log(`\nchecking shares...\n`);
   const shares = await pool.getShares(signer.address, outcome);
-  console.log(`shares: ${shares.toString()}`);
+  console.log(`shares: ${shares.toString()}\n`);
 }
 
 main(OUTCOME, AMOUNT).catch(error => {
