@@ -10,46 +10,101 @@ import TeamsTable from "./components/TeamsTable"
 import EditIcon from "./components/EditIcon";
 import Modal from './components/Modal';
 import { useState } from "react";
+import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
 
-/* Temp Dummy functions */
-const useDaysLeft = () => 5
-const useTotalSponsorAmount = () => 1440
-const useUserSponsorAmount = () => 0.1
+
+ /* Initial Data */
+ /* 
+    Obs.: atenção com as chaves dos objetos, elas precisam 
+    casar com o restante do código! 
+ */
+ const useTeamData = [
+  { col1: 'Dortmund', col2: '190740', col3: '0', col4: '10', col5: '0' },
+  { col1: 'FC Porto', col2: '0', col3: '0', col4: '0', col5: '0' },
+  { col1: 'Lazio', col2: '0', col3: '0', col4: '0', col5: '0' },
+  { col1: 'Benfica', col2: '0', col3: '0', col4: '0', col5: '0' },
+  { col1: 'Real Madrid', col2: '0', col3: '0', col4: '0', col5: '0' },
+  { col1: 'PSV', col2: '0', col3: '0', col4: '0', col5: '0' },
+  { col1: 'Napoli', col2: '0', col3: '0', col4: '0', col5: '0' },
+];
+
+const columns = [
+  { header: 'Team', accessor: 'col1' },
+  { header: 'Total deposit (USDC)', accessor: 'col2' },
+  { header: 'Total yield (USDC)', accessor: 'col3' },
+  { header: 'Your deposit (USDC)', accessor: 'col4' },
+  { header: 'Your yield (USDC)', accessor: 'col5' },
+];
+
+const useSponsorData = [
+  {name: 'UEFA Champions League 2023', totalAmount: 10, userAmount: 0},
+  {name: 'blablabal', totalAmount: 2, userAmount: 0.1}
+]
 
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  /* State management */
+  const [teamTableData, setTeamTableData] = useState(useTeamData)
+  const [sponsorData, setSponsorData] = useState(useSponsorData)
+  const [isTeamDepositModalOpen, setIsTeamDepositModalOpen] = useState(false);
+  const [isSponsorDepositModalOpen, setIsSponsorDepositModalOpen] = useState(false);
+  const [targetTeamName, setTargetTeamName] = useState('');
+  const [tournamentName, setTournamentName] = useState('UEFA Champions League 2023')
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  /* Auxiliary functions */
+  const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
+  const closeTeamDepositModal = () => setIsTeamDepositModalOpen(false);
+  const openSponsorDepositModal = () => setIsSponsorDepositModalOpen(true);
+  const closeSponsorDepositModal = () => setIsSponsorDepositModalOpen(false);
+  const handleSponsorDepositEdit = () => {
+    openSponsorDepositModal()
+  }
+  const updateSponsorData = (targetTournament, amount) => {
+    let newSponsorData = [...sponsorData]
+    newSponsorData.map((tournament) => {
+      if (tournament.name === targetTournament) {
+        tournament.totalAmount = tournament.totalAmount + amount
+        tournament.userAmount = tournament.userAmount + amount
+    }})
+    setSponsorData(newSponsorData)
+  }
+  const updateTeamTableData = (targetTeam, amount) => {
+    let newTeamTableData = [...teamTableData]
+    newTeamTableData.map((row) => {
+      if (row.col1 === targetTeam) {
+        row.col2 = parseFloat(row.col2) + parseFloat(amount)
+        row.col4 = parseFloat(row.col4) + parseFloat(amount)
+      }
+    })
+    setTeamTableData(newTeamTableData)
+  }
 
-  const SponsorButton = () => {
+  /* Components */
+  const SponsorButton = ({ openSponsorDepositModal }) => {
     return (
-      <button className="px-4 py-2 bg-gray-500 border-gray-500 border rounded-lg text-lg text-center">
-        Deposit amount
+      <button onClick={openSponsorDepositModal} className="w-full px-4 py-2 bg-gray-500 border-gray-500 border rounded-lg text-lg text-center">
+        DEPOSIT
       </button>
     )
   }
 
-  const data = [
-    { col1: 'Dortmund', col2: '190740', col3: '0', col4: '0', col5: '0' },
-    { col1: 'FC Porto', col2: '0', col3: '0', col4: '0', col5: '0' },
-    { col1: 'Lazio', col2: '0', col3: '0', col4: '0', col5: '0' },
-    { col1: 'Benfica', col2: '0', col3: '0', col4: '0', col5: '0' },
-    { col1: 'Real Madrid', col2: '0', col3: '0', col4: '0', col5: '0' },
-    { col1: 'PSV', col2: '0', col3: '0', col4: '0', col5: '0' },
-    { col1: 'Napoli', col2: '0', col3: '0', col4: '0', col5: '0' },
-  ];
-  const columns = [
-    { header: 'Team', accessor: 'col1' },
-    { header: 'Total deposit (USDC)', accessor: 'col2' },
-    { header: 'Total yield (USDC)', accessor: 'col3' },
-    { header: 'Your deposit (USDC)', accessor: 'col4' },
-    { header: 'Your yield (USDC)', accessor: 'col5' },
-  ];
-  const daysLeft = useDaysLeft();
-  const totalSponsorAmount = useTotalSponsorAmount();
-  const userSponsorAmount = useUserSponsorAmount();
+  /* Temporary Dummy functions */
+  const getDaysLeft = () => 5
+  const getTotalSponsorAmount = () => sponsorData[0].totalAmount
+  const getUserSponsorData = () => sponsorData[0].userAmount
+  const getUserDepositAmount = (teamTableData, teamName) => {
+    let currentUserDepositAmount = 0
+    teamTableData.map((row) => {
+      if (row.col1 === teamName) {
+        currentUserDepositAmount = parseFloat(row.col4)
+      }
+    })
+    return currentUserDepositAmount
+  }
 
+  /* Variables */
+  const daysLeft = getDaysLeft();
+  const totalSponsorAmount = getTotalSponsorAmount();
+  const userSponsorAmount = getUserSponsorData();
 
   return (
     <section className="w-full">
@@ -60,16 +115,32 @@ export default function Home() {
             <span className="text-2xl font-semibold text-gray-900">Logo</span>
           </div>
         </Link>
-        <button onClick={openModal} className="p-2 bg-blue-500 text-white rounded">
-        Open Modal
-      </button>
       </header>
-      <Modal isOpen={isModalOpen} onClose={closeModal} />
-      <main className="container mx-auto px-8 py-4">
+      {isTeamDepositModalOpen &&
+        <Modal
+          onClose={closeTeamDepositModal} 
+          targetTeam={targetTeamName}
+          currentUserAmount={getUserDepositAmount(teamTableData, targetTeamName)}
+          setCurrentUserAmount={(amount) => updateTeamTableData(targetTeamName, amount)}
+          depositText={teamDepositText(targetTeamName, getUserDepositAmount(teamTableData, targetTeamName))}
+          withdrawText={teamWithdrawText(targetTeamName, getUserDepositAmount(teamTableData, targetTeamName))}
+        />
+      }
+      {isSponsorDepositModalOpen &&
+        <Modal 
+          onClose={closeSponsorDepositModal} 
+          targetName={tournamentName}
+          currentUserAmount={getUserSponsorData()}
+          setCurrentUserAmount={(amount) => updateSponsorData(tournamentName, amount)}
+          depositText={sponsorDepositText(tournamentName, getUserSponsorData())}
+          withdrawText={sponsorWithdrawText(tournamentName, getUserSponsorData())}
+        />
+      }
+      <main className="container mx-auto px-8">
         <div className="grid grid-cols-10 grid-rows-8 gap-6">
-          <div className="text-center col-span-10 bg-red-500 text-3xl">
+          {/* <div className="text-center col-span-10 bg-red-500 text-3xl">
             Let the games begin!
-          </div>
+          </div> */}
           <div className="col-span-10 row-start-2">
             <div className="bg-red-500">
               <p className="text-gray-900 text-2xl">
@@ -80,7 +151,7 @@ export default function Home() {
           <div className="py-6 px-12 rounded-lg bg-white col-span-4 row-span-2 row-start-3">
             <div className="flex flex-col items-center place-content-between h-full">
               <div className="bg-red-500 text-xl">This tournament ends in</div>
-              <div className="bg-red-500 text-4xl">
+              <div className="bg-red-500 text-3xl">
                 {daysLeft} <span className="">days</span>
               </div>
             </div>
@@ -91,7 +162,7 @@ export default function Home() {
                 <div className="bg-red-500 text-xl">
                   Total sponsor amount
                 </div>
-                <div className="bg-red-500 text-4xl">
+                <div className="bg-red-500 text-3xl">
                   {totalSponsorAmount} <span className="text-2xl">USDC</span>
                 </div>
               </div>
@@ -101,23 +172,22 @@ export default function Home() {
                     ? 'Your sponsor amount'
                     : 'Sponsor this tournament'}
                 </div>
-                <div className="text-4xl">
+                <div className="text-3xl">
                   {userSponsorAmount > 0 
                     ? <div className="flex gap-3 items-end">
                         {userSponsorAmount} 
                         <span className="text-2xl"> USDC</span>
                         <div className="pl-2 place-self-center">
-                          <EditIcon withBorder={true} size={32}/>
+                          <EditIcon handleOnClick={handleSponsorDepositEdit} size={32}/>
                         </div>
                       </div>
-                    : <SponsorButton />} 
+                    : <SponsorButton openSponsorDepositModal={openSponsorDepositModal} />} 
                 </div>
-                
               </div>
             </div>
           </div>
           <div className="col-span-10 row-span-4 row-start-5">
-            <TeamsTable data={data} columns={columns} />
+            <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} openTeamDepositModal={openTeamDepositModal}/>
           </div>
         </div>
       </main>

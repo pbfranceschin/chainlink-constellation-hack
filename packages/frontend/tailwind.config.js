@@ -7,25 +7,30 @@ module.exports = {
   ],
   theme: {
     extend: {
+      height: {
+        '0.5screen': '50vh',
+      },
       maxHeight: {
         '0.5full': '50%', 
         '0.5screen': '50vh', 
         '0.45screen': '45vh', 
       },
-      height: {
-        '0.5screen': '50vh',
+      minWidth: {
+        '0.5full': '50%',
       },
       width: {
+        '0.5full': '50%',
+        '0.7full': '70%',
+      },
+      maxWidth: {
         '0.5full': '50%',
       },
       padding: {
         '0.5full': '30%'
       },
       spacing: {
-        '7px': '7px',
-        '8px': '8px',
-        '9px': '9px',
-        '11px': '11px'
+        '2px': '2px',
+        '72px':'72px'
       }
     },
   },

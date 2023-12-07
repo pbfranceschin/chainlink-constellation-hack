@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import NumericInput from './NumericInput';
 import Button from './Button';
 
-const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, withdrawText}) => {
+const ModalSponsorDeposit = ({ isOpen, onClose, targetTournament, currentUserSponsor, setCurrentUserSponsor }) => {
   const [activeTab, setActiveTab] = useState('deposit');
   const [currentInputValue, setCurrentInputValue] = useState(0)
   
+  if (!isOpen) return null;
+
   const handleClose = (e) => {
     if (e.target.id === 'modal-overlay') {
       onClose();
@@ -13,11 +15,11 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
   };
 
   const handleSubmitDeposit = () => {
-    setCurrentUserAmount(currentInputValue)
+    setCurrentUserSponsor(currentInputValue)
     onClose()
   }
   const handleSubmitWithdraw = () => {
-    setCurrentUserAmount(-currentInputValue)
+    setCurrentUserSponsor(-currentInputValue)
     onClose()
   }
 
@@ -43,10 +45,14 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
             &times;
           </button>
           {activeTab === 'deposit' && 
-            <div className={`w-full flex flex-col ${currentUserAmount > 0 ? 'gap-72px' : 'gap-8'}`}>
-              {currentUserAmount > 0 
-                ? depositText.textPositiveAmount
-                : depositText.textZeroAmount
+            <div className="w-full flex flex-col gap-8">
+              {currentUserSponsor > 0 
+                ? <p>
+                    You have a total sponsor amount of <span className="font-semibold">{currentUserSponsor} USDC</span> on the <span className="font-semibold">{targetTournament}</span> tournament. How much would you like to deposit?
+                  </p>
+                : <p>
+                    Choose the amount to sponsor the <span className="font-semibold">{targetTournament}</span> tournament.
+                  </p>
               }
               <NumericInput setCurrentInputValue={setCurrentInputValue}/>
               <Button label={'DEPOSIT VALUE'} handleOnClick={handleSubmitDeposit} />
@@ -54,18 +60,22 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
           }
           {activeTab === 'withdraw' && 
             <div className="w-full flex flex-col gap-8">
-              {currentUserAmount > 0 
-                ? withdrawText.textPositiveAmount
-                : withdrawText.textZeroAmount
+              {currentUserSponsor > 0 
+                ? <p>
+                    You have a total sponsor amount of <span className="font-semibold">{currentUserSponsor} USDC</span> on the <span className="font-semibold">{targetTournament}</span> tournament. How much would you like to withdraw?
+                  </p>
+                : <p>
+                    You haven't sponsor this tournament yet.
+                  </p>
               }
-              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > 0 ? true : false} />
-              {currentUserAmount > 0 &&
-                <p className="text-gray-500">
+              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserSponsor} isActive={currentUserSponsor > 0 ? true : false} />
+              {currentUserSponsor > 0 &&
+                <p>
                   Value to withdraw: <span className="font-semibold">{currentInputValue} USDC</span> <br />
-                  Remaining amount after withdraw: <span className="font-semibold">{Math.max(0, currentUserAmount - currentInputValue)} USDC</span>
+                  Remaining sponsor amount: <span className="font-semibold">{Math.max(0, currentUserSponsor - currentInputValue)} USDC</span>
                 </p>
               }
-              <Button label={'WITHDRAW VALUE'} handleOnClick={handleSubmitWithdraw} isActive={currentUserAmount > 0 ? true : false}/>
+              <Button label={'WITHDRAW VALUE'} handleOnClick={handleSubmitWithdraw} isActive={currentUserSponsor > 0 ? true : false}/>
             </div>
           }
         </div>
@@ -74,4 +84,4 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
   );
 };
 
-export default Modal;
+export default ModalSponsorDeposit;
