@@ -10,6 +10,8 @@ import TeamsTable from "./components/TeamsTable"
 import EditIcon from "./components/EditIcon";
 import Modal from './components/Modal';
 import { useState } from "react";
+import { useTVL, useTotalYield } from "./hooks/pool";
+import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 
 /* Temp Dummy functions */
 const useDaysLeft = () => 5
@@ -49,6 +51,11 @@ export default function Home() {
   const daysLeft = useDaysLeft();
   const totalSponsorAmount = useTotalSponsorAmount();
   const userSponsorAmount = useUserSponsorAmount();
+  const tvl = useTVL();
+  const totalYield = useTotalYield(mumbaiUSDCPool);
+
+  console.log('tvl',tvl);
+  console.log('totalYield', totalYield);
 
 
   return (
