@@ -165,6 +165,23 @@ export function usePoolController (poolAddress) {
   return { data, isError, isLoading };
 }
 
+function controllerRead (controllerAddress, methodName, args) {
+  const { 
+    data, 
+    isError, 
+    isLoading 
+  } = useContractRead({
+    address: controllerAddress || "0x0",
+    abi: controllerArtifact.abi,
+    functionName: 'getOutcomesCount',
+    args: args || [],
+    chainId: 80001,
+    watch: true
+  });
+
+  return { data, isError, isLoading };
+}
+
 export function useTeamCount (poolAddress) {
   const { 
     data: controllerAddress, 
@@ -176,14 +193,7 @@ export function useTeamCount (poolAddress) {
     data, 
     isError: isErrorTeamCount, 
     isLoading: isLoadingTeamCount 
-  } = useContractRead({
-    address: controllerAddress || "0x0",
-    abi: controllerArtifact.abi,
-    functionName: 'getOutcomesCount',
-    args: [],
-    chainId: 80001,
-    watch: true
-  });
+  } = controllerRead(controllerAddress, 'getOutcomesCount', []);
 
   let teamCount = undefined;
   if (data) {
@@ -193,4 +203,8 @@ export function useTeamCount (poolAddress) {
   const isLoading = isLoadingController || isLoadingTeamCount;
   const isError = !isLoading || (isErrorController || isErrorTeamCount);
   return { teamCount, isError, isLoading };
+}
+
+export function useTeamTableData (poolAddress) {
+  
 }
