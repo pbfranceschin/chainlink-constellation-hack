@@ -28,7 +28,7 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const account = async() => {
   if(!PRIVATE_KEY) throw new Error('missing env');
   const signer = new ethers.Wallet(PRIVATE_KEY, provider);
-  const token = new ethers.Contract(mumbaiTestUSDC, mockAsset.abi, provider);
+  const token = new ethers.Contract(ASSET, mockAsset.abi, provider);
   let bal = await token.balanceOf(signer.address);
   console.log(`token balance: ${bal}`);
 }

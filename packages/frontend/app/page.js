@@ -9,12 +9,17 @@ import Link from "next/link"
 import TeamsTable from "./components/TeamsTable"
 import EditIcon from "./components/EditIcon";
 import Modal from './components/Modal';
-import React, { useState } from "react";
-import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
+import React, { useState, useEffect } from "react";
 import { ConnectButton } from "./components/ConnectButton";
-import { useTVL, useTotalYield } from "./hooks/pool";
-import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 import Button from "./components/Button";
+import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
+import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield } from "./hooks/pool";
+import { getApiAddress } from "./utils";
+import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
+import { privateKeyToAccount } from 'viem/accounts' 
+
+const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
+const account = privateKeyToAccount(pkey2);
 
  /* Initial Test Data */
  /* 
@@ -111,9 +116,23 @@ export default function Home() {
   }
   const tvl = useTVL();
   const totalYield = useTotalYield(mumbaiUSDCPool);
+  const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
+  const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
 
+  // useEffect(() => {
+  //   const resolveApi = async() => {
+  //     setApi(await getApiAddress(mumbaiUSDCPool));
+  //   }
+  //   resolveApi();
+  // })
+
+  // console.log('api', api);
+  console.log('indYield', indYield);
   console.log('tvl',tvl);
   console.log('totalYield', totalYield);
+  console.log('yieldByOutcome', yieldByOutcome);
+  // console.log('pkey', pkey2);
+  // console.log('account', account.address);
 
   /* Variables */
   const totalSponsorAmount = getTotalSponsorAmount();
