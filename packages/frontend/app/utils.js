@@ -1,7 +1,7 @@
 import pool from "../blockchain/contracts/artifacts/Pool.json";
 import IERC4626 from "../blockchain/interfaces/IERC4626.json"
 import { polygonMumbai } from "viem/chains";
-import { createPublicClient, http } from 'viem'
+import { createPublicClient, http, formatUnits } from 'viem'
 
 export const publicClient = createPublicClient({
   chain: polygonMumbai,
@@ -25,4 +25,12 @@ export async function getApiAddress(poolAddress) {
     functionName: 'vaultAPI',
   });
   return ret;    
+}
+
+export function formatBigInt (n, decimalPlaces) {
+  if (n === undefined) {
+    return '-';
+  }
+  const formated = formatUnits(n, 6);
+  return formated;
 }

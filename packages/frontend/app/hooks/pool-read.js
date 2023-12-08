@@ -6,6 +6,7 @@ import api from "../../blockchain/contracts/mumbai/AaveAPI.json";
 import { convertToAssets, getApiAddress } from "../utils";
 import { hexToString } from 'viem'
 import IERC4626 from "../../blockchain/interfaces/IERC4626.json"
+import { formatBigInt } from "../utils";
 
 export function useTVL(poolAddress) {
   const { data, isError, isLoading } = useContractRead({
@@ -231,10 +232,10 @@ function getTeamTableRow (poolAddress, userAddress, row) {
   const userYield = useIndividualYield(account, fixRow(row), poolAddress);
   return { 
     col1: teamName || '-',
-    col2: teamTotalDeposited !== undefined ? teamTotalDeposited.toString() : '-',
-    col3: totalYield !== undefined ? totalYield.toString() : '-',
-    col4: userDeposit !== undefined ? userDeposit.toString() : '-',
-    col5: userYield !== undefined ? userYield.toString() : '-', 
+    col2: formatBigInt(teamTotalDeposited),
+    col3: formatBigInt(totalYield),
+    col4: formatBigInt(userDeposit),
+    col5: formatBigInt(userYield), 
   };
 }
 

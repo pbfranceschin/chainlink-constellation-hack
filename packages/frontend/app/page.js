@@ -21,6 +21,7 @@ import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 import { useDeposit, useSponsor, useUnStake } from "./hooks/pool-writes";
 import { useAccount } from "wagmi";
 import { useAllowance, useApprove } from "./hooks/asset";
+import { formatBigInt } from "./utils";
 
 import { mumbaiTestUSDC } from "@/blockchain/addresses/testnet";
 
@@ -91,7 +92,7 @@ export default function Home() {
     POOL_ADDRESS
   );
 
-
+  
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
   const closeTeamDepositModal = () => setIsTeamDepositModalOpen(false);
@@ -244,7 +245,7 @@ export default function Home() {
                   </h2>
                   <span className="text-4xl">
                     {/* TVL */}
-                    {TVL.isLoading ? 'loading...' : TVL.data.toString()} <span className="text-2xl">{ASSET}</span>
+                    {TVL.isLoading ? 'loading...' : formatBigInt(TVL.data)} <span className="text-2xl">{ASSET}</span>
                   </span>
                 </div>
               </div>
@@ -254,7 +255,7 @@ export default function Home() {
                   Total sponsored
                 </div>
                 <div className="text-4xl">
-                  {totalSponsorAmount.isLoading ? 'loading...' : totalSponsorAmount.data.toString()} <span className="text-2xl">{ASSET}</span>
+                  {totalSponsorAmount.isLoading ? 'loading...' : formatBigInt(totalSponsorAmount.data)} <span className="text-2xl">{ASSET}</span>
                 </div>
               </div>
             </div>
@@ -271,7 +272,7 @@ export default function Home() {
                   {!userSponsorAmount.isLoading && 
                     (userSponsorAmount.data > 0 
                       ? <div className="flex gap-3 items-end text-4xl">
-                        {userSponsorAmount.data.toString()} 
+                        {formatBigInt(userSponsorAmount.data)} 
                           <span className="text-2xl"> {ASSET}</span>
                           <div className="pl-2 place-self-center">
                             <EditIcon handleOnClick={handleSponsorDepositEdit} size={32}/>
