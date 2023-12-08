@@ -12,14 +12,16 @@ import Modal from './components/Modal';
 import React, { useState, useEffect } from "react";
 import { ConnectButton } from "./components/ConnectButton";
 import Button from "./components/Button";
+import Logo from "./components/Logo"
+import LogoName from "./components/LogoName"
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
 import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield } from "./hooks/pool";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 import { privateKeyToAccount } from 'viem/accounts' 
 
-const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
-const account = privateKeyToAccount(pkey2);
+// const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
+// const account = privateKeyToAccount(pkey2);
 
  /* Initial Test Data */
  /* 
@@ -114,10 +116,10 @@ export default function Home() {
     })
     return currentUserDepositAmount
   }
-  const tvl = useTVL();
-  const totalYield = useTotalYield(mumbaiUSDCPool);
-  const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
-  const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
+  // const tvl = useTVL();
+  // const totalYield = useTotalYield(mumbaiUSDCPool);
+  // const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
+  // const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
 
   // useEffect(() => {
   //   const resolveApi = async() => {
@@ -127,10 +129,10 @@ export default function Home() {
   // })
 
   // console.log('api', api);
-  console.log('indYield', indYield);
-  console.log('tvl',tvl);
-  console.log('totalYield', totalYield);
-  console.log('yieldByOutcome', yieldByOutcome);
+  // console.log('indYield', indYield);
+  // console.log('tvl',tvl);
+  // console.log('totalYield', totalYield);
+  // console.log('yieldByOutcome', yieldByOutcome);
   // console.log('pkey', pkey2);
   // console.log('account', account.address);
 
@@ -141,11 +143,12 @@ export default function Home() {
   return (
     <section className="w-full main-section bg-background2 relative">
       <header className="fixed top-0 left-0 right-0 z-50 flex flex-row items-center h-16 bg-background2">
-        <div className="container mx-auto px-8 flex flex-row place-content-between">
+        <div className="container mx-auto px-8 flex flex-row place-content-between items-center">
           <Link href="#">
-            <div className="flex items-center space-x-2">
-              <IconHome className="h-8 w-8 text-text1" />
-              <span className="text-2xl font-semibold text-text1">Logo</span>
+            <div className="flex items-center place-content-center space-x-2">
+              <Logo />
+              {/* <span className="text-2xl font-semibold text-text1">Logo</span> */}
+              <LogoName />
             </div>
           </Link>
           <ConnectButton />
@@ -172,9 +175,9 @@ export default function Home() {
         />
       }
       <main className="h-full container mx-auto px-8 bg-background2">
-        <div className="h-fit pb-8 flex flex-col gap-8 bg-background2">
+        <div className="h-fit pb-6 flex flex-col gap-8 bg-background2">
           <div className="mt-6">
-            <h1 className="text-text1 text-4xl">
+            <h1 className="text-text1 text-4xl font-medium">
               UEFA Champions League 2023
             </h1>
           </div>
@@ -193,7 +196,7 @@ export default function Home() {
                       <h3>
                         Your prize is <span className="text-text1 font-semibold">{userPrize} USDC.</span>
                       </h3>
-                      <Button label={'COLLECT YOUR PRIZE!'} isPrize={userPrize > 0}/>
+                      <Button label={'WITHDRAW YOUR PRIZE'} isPrize={userPrize > 0}/>
                     </>
                   : <>
                       <h3>

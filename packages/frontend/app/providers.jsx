@@ -21,8 +21,8 @@ export function Providers({ children }) {
     <WagmiConfig config={config}>
       <RainbowKitProvider 
         theme={darkTheme({
-          accentColor: '#D65780',
-          accentColorForeground: '#F5F5F5',
+          accentColor: '#C3D350',
+          accentColorForeground: '#333333',
         })} 
         chains={chains}
       >
