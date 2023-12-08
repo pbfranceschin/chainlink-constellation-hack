@@ -9,19 +9,14 @@ import Link from "next/link"
 import TeamsTable from "./components/TeamsTable"
 import EditIcon from "./components/EditIcon";
 import Modal from './components/Modal';
-import React, { useState, useEffect } from "react";
-import { ConnectButton } from "./components/ConnectButton";
-import Button from "./components/Button";
+import { useState } from "react";
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
-import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield } from "./hooks/pool";
-import { getApiAddress } from "./utils";
+import { ConnectButton } from "./components/ConnectButton";
+import { useTVL, useTotalYield } from "./hooks/pool";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
-import { privateKeyToAccount } from 'viem/accounts' 
 
-const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
-const account = privateKeyToAccount(pkey2);
 
- /* Initial Test Data */
+ /* Initial Data */
  /* 
     Obs.: atenção com as chaves dos objetos, elas precisam 
     casar com o restante do código! 
@@ -48,9 +43,6 @@ const useSponsorData = [
   {name: 'UEFA Champions League 2023', totalAmount: 10, userAmount: 0},
   {name: 'blablabal', totalAmount: 2, userAmount: 0.1}
 ]
-const useWinnerData = 'Dortmund'
-const useUserPrize = 10
-const useDaysLeft = 0
 
 export default function Home() {
   /* State management */
@@ -59,10 +51,7 @@ export default function Home() {
   const [isTeamDepositModalOpen, setIsTeamDepositModalOpen] = useState(false);
   const [isSponsorDepositModalOpen, setIsSponsorDepositModalOpen] = useState(false);
   const [targetTeamName, setTargetTeamName] = useState('');
-  const [tournamentName, setTournamentName] = useState('UEFA Champions League 2023');
-  const [winnerTeam, setWinnerTeam] = useState(useWinnerData);
-  const [userPrize, setUserPrize] = useState(useUserPrize);
-  const [daysLeft, setDaysLeft] = useState(useDaysLeft);
+  const [tournamentName, setTournamentName] = useState('UEFA Champions League 2023')
 
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
@@ -95,7 +84,7 @@ export default function Home() {
   /* Components */
   const SponsorButton = ({ openSponsorDepositModal }) => {
     return (
-      <button onClick={openSponsorDepositModal} className="w-full px-4 py-2 bg-gray-500 border-gray-500 border rounded-2xl text-lg text-center">
+      <button onClick={openSponsorDepositModal} className="w-full px-4 py-2 bg-gray-500 border-gray-500 border rounded-lg text-lg text-center">
         DEPOSIT
       </button>
     )
@@ -116,36 +105,23 @@ export default function Home() {
   }
   const tvl = useTVL();
   const totalYield = useTotalYield(mumbaiUSDCPool);
-  const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
-  const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
 
-  // useEffect(() => {
-  //   const resolveApi = async() => {
-  //     setApi(await getApiAddress(mumbaiUSDCPool));
-  //   }
-  //   resolveApi();
-  // })
-
-  // console.log('api', api);
-  console.log('indYield', indYield);
   console.log('tvl',tvl);
   console.log('totalYield', totalYield);
-  console.log('yieldByOutcome', yieldByOutcome);
-  // console.log('pkey', pkey2);
-  // console.log('account', account.address);
 
   /* Variables */
+  const daysLeft = getDaysLeft();
   const totalSponsorAmount = getTotalSponsorAmount();
   const userSponsorAmount = getUserSponsorData();
 
   return (
-    <section className="w-full main-section bg-background2 relative">
-      <header className="fixed top-0 left-0 right-0 z-50 flex flex-row items-center h-16 bg-background2">
+    <section className="w-full">
+      <header className="sticky top-0 z-50 flex flex-row items-center h-16 bg-white">
         <div className="container mx-auto px-8 flex flex-row place-content-between">
           <Link href="#">
             <div className="flex items-center space-x-2">
-              <IconHome className="h-8 w-8 text-text1" />
-              <span className="text-2xl font-semibold text-text1">Logo</span>
+              <IconHome className="h-8 w-8 text-gray-900" />
+              <span className="text-2xl font-semibold text-gray-900">Logo</span>
             </div>
           </Link>
           <ConnectButton />
@@ -171,83 +147,59 @@ export default function Home() {
           withdrawText={sponsorWithdrawText(tournamentName, getUserSponsorData())}
         />
       }
-      <main className="h-full container mx-auto px-8 bg-background2">
-        <div className="h-fit pb-8 flex flex-col gap-8 bg-background2">
-          <div className="mt-6">
-            <h1 className="text-text1 text-4xl">
-              UEFA Champions League 2023
-            </h1>
+      <main className="container mx-auto px-8">
+        <div className="grid grid-cols-10 grid-rows-8 gap-6">
+          {/* <div className="text-center col-span-10 bg-red-500 text-3xl">
+            Let the games begin!
+          </div> */}
+          <div className="col-span-10 row-start-2">
+            <div className="bg-red-500">
+              <p className="text-gray-900 text-2xl">
+                UEFA Champions League 2023
+              </p>
+            </div>
           </div>
-          {
-            daysLeft === 0 &&
-            <div className="w-full flex justify-center">
-              <div className="py-6 px-9 rounded-3xl bg-background1 h-full w-0.7full flex flex-col gap-5 items-center place-content-between text-text2 text-center text-2xl">
-                <h2 className="mb-4 text-3xl">
-                  This tournament has ended!
-                </h2>
-                <h3>
-                  The winner is <span className="text-text1 font-semibold">{winnerTeam}</span>.<br />
-                </h3>
-                {userPrize > 0 
-                  ? <>
-                      <h3>
-                        Your prize is <span className="text-text1 font-semibold">{userPrize} USDC.</span>
-                      </h3>
-                      <Button label={'COLLECT YOUR PRIZE!'} isPrize={userPrize > 0}/>
-                    </>
-                  : <>
-                      <h3>
-                        Your have no prize to collect.
-                      </h3>
-                    </>
-                }
-                
+          <div className="py-6 px-12 rounded-lg bg-white col-span-4 row-span-2 row-start-3">
+            <div className="flex flex-col items-center place-content-between h-full">
+              <div className="bg-red-500 text-xl">This tournament ends in</div>
+              <div className="bg-red-500 text-3xl">
+                {daysLeft} <span className="">days</span>
               </div>
             </div>
-          }
-          <div className="grid grid-cols-3 gap-8 h-fit">
-             <div className="py-6 px-9 rounded-3xl bg-background1">
-                <div className="flex flex-col items-center place-content-between h-full text-text2">
-                  <h2 className="text-xl">
-                    This tournament ends in
-                  </h2>
-                  <span className="text-4xl">
-                    {daysLeft} <span className="">days</span>
-                  </span>
-                </div>
-              </div>
-            <div className="py-6 px-9 rounded-3xl bg-background1 text-text2 ">
-              <div className="flex flex-col items-left place-content-between h-full">
-                <div className="text-xl">
+          </div>
+          <div className="col-span-6 row-span-2 col-start-5 row-start-3">
+            <div className="flex flex-row gap-6 h-full">
+              <div className="flex flex-col items-left place-content-between py-6 px-12 rounded-lg bg-white">
+                <div className="bg-red-500 text-xl">
                   Total sponsor amount
                 </div>
-                <div className="text-4xl">
+                <div className="bg-red-500 text-3xl">
                   {totalSponsorAmount} <span className="text-2xl">USDC</span>
                 </div>
               </div>
-            </div>
-            <div className="py-6 px-9 rounded-3xl bg-background1 text-text2 ">
-              <div className="flex flex-col items-left gap-6">
-                <div className="text-xl">
+              <div className="flex-grow flex flex-col items-left gap-5 py-6 px-12 rounded-lg bg-white ">
+                <div className="bg-red-500 text-xl">
                   {userSponsorAmount > 0 
                     ? 'Your sponsor amount'
                     : 'Sponsor this tournament'}
                 </div>
-                <div className="">
+                <div className="text-3xl">
                   {userSponsorAmount > 0 
-                    ? <div className="flex gap-3 items-end text-4xl">
+                    ? <div className="flex gap-3 items-end">
                         {userSponsorAmount} 
                         <span className="text-2xl"> USDC</span>
                         <div className="pl-2 place-self-center">
                           <EditIcon handleOnClick={handleSponsorDepositEdit} size={32}/>
                         </div>
                       </div>
-                    : <Button label={'DEPOSIT'} handleOnClick={openSponsorDepositModal} isActive={daysLeft > 0} />} 
+                    : <SponsorButton openSponsorDepositModal={openSponsorDepositModal} />} 
                 </div>
               </div>
             </div>
           </div>
-          <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} openTeamDepositModal={openTeamDepositModal} isTournamentEnd={daysLeft === 0}/>
+          <div className="col-span-10 row-span-4 row-start-5">
+            <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} openTeamDepositModal={openTeamDepositModal}/>
+          </div>
         </div>
       </main>
     </section>
