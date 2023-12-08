@@ -151,3 +151,15 @@ export function useYieldByOutcome(outcome, poolAddress) {
   }, [poolAddress, stake, shares]);
   return { ret, isLoading, error }
 }
+
+export function usePoolController (poolAddress) {
+  const { data, isError, isLoading } = useContractRead({
+    address: poolAddress,
+    abi: pool.abi,
+    functionName: 'resultController',
+    args: [0],
+    chainId: 80001,
+    watch: true
+  });
+  return { data, isError, isLoading };
+}
