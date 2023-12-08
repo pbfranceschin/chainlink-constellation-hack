@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useContractRead } from "wagmi";
 import pool  from "../../blockchain/contracts/artifacts/Pool.json";
+import controllerArtifact  from "../../blockchain/contracts/artifacts/IResultController.json";
 import api from "../../blockchain/contracts/mumbai/AaveAPI.json";
 import { convertToAssets, getApiAddress } from "../utils";
 
@@ -157,9 +158,39 @@ export function usePoolController (poolAddress) {
     address: poolAddress,
     abi: pool.abi,
     functionName: 'resultController',
-    args: [0],
+    args: [],
     chainId: 80001,
     watch: true
   });
   return { data, isError, isLoading };
+}
+
+export function useTeamCount (poolAddress) {
+  const { 
+    data: controllerAddress, 
+    isError: isErrorController,
+    isLoading: isLoadingController 
+  } = usePoolController(poolAddress);
+  
+  const { 
+    data, 
+    isError: isErrorTeamCount, 
+    isLoading: isLoadingTeamCount 
+  } = useContractRead({
+    address: controllerAddress || "0x0",
+    abi: controllerArtifact.abi,
+    functionName: 'getOutcomesCount',
+    args: [],
+    chainId: 80001,
+    watch: true
+  });
+
+  let teamCount = undefined;
+  if (data) {
+    teamCount = Number(data) - 1;
+  }
+
+  const isLoading = isLoadingController || isLoadingTeamCount;
+  const isError = !isLoading || (isErrorController || isErrorTeamCount);
+  return { teamCount, isError, isLoading };
 }
