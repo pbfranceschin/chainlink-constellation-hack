@@ -20,8 +20,8 @@ import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 import { privateKeyToAccount } from 'viem/accounts' 
 
-// const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
-// const account = privateKeyToAccount(pkey2);
+const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
+const account = privateKeyToAccount(pkey2);
 
  /* Initial Test Data */
  /* 
@@ -116,10 +116,10 @@ export default function Home() {
     })
     return currentUserDepositAmount
   }
-  // const tvl = useTVL();
-  // const totalYield = useTotalYield(mumbaiUSDCPool);
-  // const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
-  // const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
+  const tvl = useTVL();
+  const totalYield = useTotalYield(mumbaiUSDCPool);
+  const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
+  const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
 
   // useEffect(() => {
   //   const resolveApi = async() => {
@@ -128,13 +128,13 @@ export default function Home() {
   //   resolveApi();
   // })
 
-  // console.log('api', api);
-  // console.log('indYield', indYield);
-  // console.log('tvl',tvl);
-  // console.log('totalYield', totalYield);
-  // console.log('yieldByOutcome', yieldByOutcome);
-  // console.log('pkey', pkey2);
-  // console.log('account', account.address);
+  console.log('api', api);
+  console.log('indYield', indYield);
+  console.log('tvl',tvl);
+  console.log('totalYield', totalYield);
+  console.log('yieldByOutcome', yieldByOutcome);
+  console.log('pkey', pkey2);
+  console.log('account', account.address);
 
   /* Variables */
   const totalSponsorAmount = getTotalSponsorAmount();
