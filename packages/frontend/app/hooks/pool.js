@@ -4,6 +4,7 @@ import pool  from "../../blockchain/contracts/artifacts/Pool.json";
 import controllerArtifact  from "../../blockchain/contracts/artifacts/IResultController.json";
 import api from "../../blockchain/contracts/mumbai/AaveAPI.json";
 import { convertToAssets, getApiAddress } from "../utils";
+import { hexToString } from 'viem'
 
 export function useTVL() {
   const { data, isError, isLoading } = useContractRead({
@@ -105,7 +106,7 @@ export function useIndividualYield(account, outcome, poolAddress) {
   const [error, setError] = useState();
   const { data: stake } = useStake(account, outcome, poolAddress);
   const { data: shares } = useShares(account, outcome, poolAddress);
-  
+
   useEffect(() => {
     setIsLoading(true);
     const resolveYield = async() => {
@@ -173,7 +174,7 @@ function controllerRead (controllerAddress, methodName, args) {
   } = useContractRead({
     address: controllerAddress || "0x0",
     abi: controllerArtifact.abi,
-    functionName: 'getOutcomesCount',
+    functionName: methodName,
     args: args || [],
     chainId: 80001,
     watch: true
@@ -205,6 +206,39 @@ export function useTeamCount (poolAddress) {
   return { teamCount, isError, isLoading };
 }
 
-export function useTeamTableData (poolAddress) {
-  
+function fixRow (row) {
+  return row + 1;
+}
+
+function useTeamName (poolAddress, row) {
+  const fixedRow = fixRow(row);
+  const { data: controllerAddress } = usePoolController(poolAddress);
+  const { data: encodedTeamName} = controllerRead(controllerAddress, 'getOutcomeName', [fixedRow]);
+  return encodedTeamName ? hexToString(encodedTeamName) : '-';
+}
+
+function getTeamTableRow (poolAddress, userAddress, row) {
+  const teamName = useTeamName(poolAddress, row);
+  const { data: teamTotalDeposited } = useStakeByOutcome(fixRow(row), poolAddress);
+  const { ret: totalYield } = useYieldByOutcome(fixRow(row), poolAddress);
+  const account = userAddress || "0x0000000000000000000000000000000000000000";
+  const { data: userDeposit } = useStake(account, fixRow(row), poolAddress);
+  const { ret: userYield } = useIndividualYield(account, fixRow(row), poolAddress);
+  return { 
+    col1: teamName || '-',
+    col2: teamTotalDeposited !== undefined ? teamTotalDeposited.toString() : '-',
+    col3: totalYield !== undefined ? totalYield.toString() : '-',
+    col4: userDeposit !== undefined ? userDeposit.toString() : '-',
+    col5: userYield !== undefined ? userYield.toString() : '-', 
+  };
+}
+
+export function useTeamTableData (poolAddress, userAddress) {
+  const {teamCount, isError, isLoading} = useTeamCount(poolAddress);
+  const ret = [];
+  for (let i = 0; i < (teamCount || 0); i++) {
+    const teamRow = getTeamTableRow(poolAddress, userAddress, i);
+    ret.push(teamRow);
+  }
+  return ret;
 }
