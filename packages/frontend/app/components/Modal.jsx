@@ -71,8 +71,8 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
               <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > 0} />
               {currentUserAmount > 0 && currentInputValue &&
                 <p className="text-lg text-text4">
-                  Value to withdraw: <span className="font-semibold text-text2">{currentInputValue} USDC</span> <br />
-                  Remaining amount after withdraw: <span className="font-semibold text-text2">{currentUserAmount - currentInputValue} USDC</span>
+                  Value to withdraw: <span className="font-semibold text-text2">{currentInputValue.toString()} USDC</span> <br />
+                  Remaining amount after withdraw: <span className="font-semibold text-text2">{(currentUserAmount - currentInputValue).toString()} USDC</span>
                 </p>
               }
               {isLoading
