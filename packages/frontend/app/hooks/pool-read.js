@@ -5,6 +5,7 @@ import controllerArtifact  from "../../blockchain/contracts/artifacts/IResultCon
 import api from "../../blockchain/contracts/mumbai/AaveAPI.json";
 import { convertToAssets, getApiAddress } from "../utils";
 import { hexToString } from 'viem'
+import IERC4626 from "../../blockchain/interfaces/IERC4626.json"
 
 export function useTVL(poolAddress) {
   const { data, isError, isLoading } = useContractRead({
@@ -100,58 +101,62 @@ export function useTotalSponsorship(poolAddress) {
   return { data, isError, isLoading };  
 }
 
+export function useVaultAPI (poolAddress) {
+  const { data, isError, isLoading } = useContractRead({
+    address: poolAddress,
+    abi: pool.abi,
+    functionName: 'vaultAPI',
+    args: [],
+    chainId: 80001,
+    watch: true
+  });
+  return { data, isError, isLoading };
+}
+
+export function useConvertToAssets (vaultAddress, shares) {
+  const { data, isError, isLoading } = useContractRead({
+    address: vaultAddress,
+    abi: IERC4626.abi,
+    functionName: 'convertToAssets',
+    args: [shares || 0],
+    chainId: 80001,
+    watch: true
+  });
+  return { data, isError, isLoading };
+}
+
 export function useIndividualYield(account, outcome, poolAddress) {
-  const [ret, setRet] = useState();
-  const [isLoading, setIsLoading] = useState();
-  const [error, setError] = useState();
   const { data: stake } = useStake(account, outcome, poolAddress);
   const { data: shares } = useShares(account, outcome, poolAddress);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const resolveYield = async() => {
-      let api;
-      let sh2ass;
-      try {
-        api = await getApiAddress(poolAddress);
-        sh2ass = await convertToAssets(shares, api);
-        setRet(sh2ass - stake);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    resolveYield();
-  }, [poolAddress, stake, shares]);
-  return { ret, isLoading, error }
+  const { data: vaultAddress } = useVaultAPI(poolAddress);
+  const { data: assets } = useConvertToAssets(vaultAddress, shares);
+  if (
+    stake !== undefined &&
+    shares !== undefined &&
+    vaultAddress !== undefined &&
+    assets !== undefined
+  ) {
+    return assets - stake;
+  } else {
+    return undefined;
+  }
 }
 
 export function useYieldByOutcome(outcome, poolAddress) {
-  const [ret, setRet] = useState();
-  const [isLoading, setIsLoading] = useState();
-  const [error, setError] = useState();
   const { data: stake } = useStakeByOutcome(outcome, poolAddress);
   const { data: shares } = useSharesByOutcome(outcome, poolAddress);
-  
-  useEffect(() => {
-    setIsLoading(true);
-    const resolveYield = async() => {
-      let api;
-      let sh2ass;
-      try {
-        api = await getApiAddress(poolAddress);
-        sh2ass = await convertToAssets(shares, api);
-        setRet(sh2ass - stake);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    resolveYield();
-  }, [poolAddress, stake, shares]);
-  return { ret, isLoading, error }
+  const { data: vaultAddress } = useVaultAPI(poolAddress);
+  const { data: assets } = useConvertToAssets(vaultAddress, shares);
+  if (
+    stake !== undefined &&
+    shares !== undefined &&
+    vaultAddress !== undefined &&
+    assets !== undefined
+  ) {
+    return assets - stake;
+  } else {
+    return undefined;
+  }
 }
 
 export function usePoolController (poolAddress) {
@@ -220,10 +225,10 @@ function useTeamName (poolAddress, row) {
 function getTeamTableRow (poolAddress, userAddress, row) {
   const teamName = useTeamName(poolAddress, row);
   const { data: teamTotalDeposited } = useStakeByOutcome(fixRow(row), poolAddress);
-  const { ret: totalYield } = useYieldByOutcome(fixRow(row), poolAddress);
+  const totalYield = useYieldByOutcome(fixRow(row), poolAddress);
   const account = userAddress || "0x0000000000000000000000000000000000000000";
   const { data: userDeposit } = useStake(account, fixRow(row), poolAddress);
-  const { ret: userYield } = useIndividualYield(account, fixRow(row), poolAddress);
+  const userYield = useIndividualYield(account, fixRow(row), poolAddress);
   return { 
     col1: teamName || '-',
     col2: teamTotalDeposited !== undefined ? teamTotalDeposited.toString() : '-',
