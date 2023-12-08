@@ -78,7 +78,7 @@ export default function Home() {
   const [winnerTeam, setWinnerTeam] = useState(useWinnerData);
   const [userPrize, setUserPrize] = useState(useUserPrize);
   // const [daysLeft, setDaysLeft] = useState(useDaysLeft);
-  const { accountAddress, isConnecting, isDisconnected } = useAccount()
+  const { address: accountAddress, isConnecting, isDisconnected } = useAccount()
   const teamTableData = useTeamTableData(poolAddress, accountAddress);
   const hasResult = useHasResult(POOL_ADDRESS);
   // const hasResult = {data: true};
