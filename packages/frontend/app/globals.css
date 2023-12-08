@@ -3,19 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 225, 225, 225;
+  --foreground-rgb: #F5F5F5;
+  --background-rgb: #202020;
+}
+
+html {
+  font-family: var(--font-montserrat);
+  background-color: rgb(var(--background-rgb));
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background-color: rgb(var(--background-rgb));
   font-size: 100%;
+  /* overflow: hidden; */
 }
 
-/* Style the scrollbar track */
+html, body {
+  height: 100%;
+  margin: 0;
+  background-color: #202020;
+}
+
 .custom-scrollbar::-webkit-scrollbar {
-  @apply w-2 bg-gray-200 rounded; /* Width of the scrollbar */
+  width: 0.5rem;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem; /* Acts like 'padding' inside the track */
 }
 
 /* Style the scrollbar thumb */
@@ -36,4 +53,16 @@ body {
 /* Reduce padding by the scrollbar's width when the scrollbar is present */
 .scrollable-body-content.has-scrollbar {
   padding-right: 40px;
+}
+
+/* .main-container {
+  height: calc(100vh - 64px); 
+} */
+
+.main-section {
+  padding-top: 64px;
+}
+
+.table-container {
+  height: calc(100vh - 362px);
 }

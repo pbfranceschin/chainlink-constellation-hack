@@ -22,24 +22,24 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
   }
 
   return (
-    <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 flex justify-center items-center p-4 z-10" onClick={handleClose}>
-      <div className="flex flex-col w-0.5full">
+    <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 backdrop-filter backdrop-blur-sm flex justify-center items-center p-4 z-10 text-text1" onClick={handleClose}>
+      <div className="flex flex-col w-0.4full">
         <div className="flex flex-row">
           <button 
             onClick={() => setActiveTab('deposit')}
-            className={`text-md rounded-t-lg px-4 py-2 ${activeTab === 'deposit' ? 'bg-white' : 'bg-gray-300'}`}
+            className={`text-md tracking-wide leading-8 rounded-t-2xl px-4 py-2 ${activeTab === 'deposit' ? 'bg-background3 font-semibold' : 'bg-background1'}`}
           >
             Deposit
           </button>
           <button
             onClick={() => setActiveTab('withdraw')}
-            className={`text-md rounded-t-lg px-4 py-2 ${activeTab === 'withdraw' ? 'bg-white' : 'bg-gray-300'}`}
+            className={`text-md tracking-wide leading-8 rounded-t-2xl px-4 py-2 ${activeTab === 'withdraw' ? 'bg-background3 font-semibold' : 'bg-background1'}`}
           >
             Withdraw
           </button>
         </div>
-        <div className="px-10 py-10 bg-white p-4 rounded-b-lg rounded-tr-lg relative">
-          <button onClick={onClose} className="absolute -top-8 -right-8 rounded-full p-1 text-4xl text-white leading-4 font-semibold z-20">
+        <div className="px-10 py-10 leading-8 bg-background3 p-4 rounded-b-3xl rounded-tr-3xl relative text-xl">
+          <button onClick={onClose} className="absolute -top-8 -right-8 rounded-full p-1 text-4xl text-text2 leading-4 font-semibold z-20">
             &times;
           </button>
           {activeTab === 'deposit' && 
@@ -60,9 +60,9 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
               }
               <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > 0 ? true : false} />
               {currentUserAmount > 0 &&
-                <p className="text-gray-500">
-                  Value to withdraw: <span className="font-semibold">{currentInputValue} USDC</span> <br />
-                  Remaining amount after withdraw: <span className="font-semibold">{Math.max(0, currentUserAmount - currentInputValue)} USDC</span>
+                <p className="text-lg text-text4">
+                  Value to withdraw: <span className="font-semibold text-text2">{currentInputValue} USDC</span> <br />
+                  Remaining amount after withdraw: <span className="font-semibold text-text2">{Math.max(0, currentUserAmount - currentInputValue)} USDC</span>
                 </p>
               }
               <Button label={'WITHDRAW VALUE'} handleOnClick={handleSubmitWithdraw} isActive={currentUserAmount > 0 ? true : false}/>

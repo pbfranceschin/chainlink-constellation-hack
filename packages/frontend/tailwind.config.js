@@ -21,9 +21,11 @@ module.exports = {
       width: {
         '0.5full': '50%',
         '0.7full': '70%',
+        '0.4full': '44%',
       },
       maxWidth: {
         '0.5full': '50%',
+        '0.4full': '40%',
       },
       padding: {
         '0.5full': '30%'
@@ -31,6 +33,18 @@ module.exports = {
       spacing: {
         '2px': '2px',
         '72px':'72px'
+      },
+      colors: {
+        background1: '#333333',
+        background2: '#202020',
+        background3: '#474747',
+        background4: '#666666',
+        text1: '#F5F5F5',
+        text2: '#D8D7D8',
+        text3: '#585858',
+        text4: '#ADADAD',
+        primary: '#129490',
+        secondary: '#D65780'
       }
     },
   },
