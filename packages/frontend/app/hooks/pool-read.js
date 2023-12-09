@@ -246,10 +246,10 @@ function getTeamTableRow (poolAddress, userAddress, row) {
   return { 
     col1: teamName || '-',
     col2: formatBigInt(teamTotalDeposited),
-    // col3: formatBigInt(yieldMultiplier),
     col3: yieldMultiplier !== undefined ? yieldMultiplier.toString() : '-',
     col4: formatBigInt(userDeposit),
     col5: formatBigInt(userYield), 
+    originalIndex: row,
   };
 }
 
@@ -260,6 +260,8 @@ export function useTeamTableData (poolAddress, userAddress) {
     const teamRow = getTeamTableRow(poolAddress, userAddress, i);
     ret.push(teamRow);
   }
+  // Sort the table by col1
+  ret.sort((a, b) => a.col1.localeCompare(b.col1));
   return ret;
 }
 
@@ -273,4 +275,3 @@ export function useHasResult(poolAddress) {
   });
   return { data, isError, isLoading };   
 }
-

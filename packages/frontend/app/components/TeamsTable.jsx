@@ -27,7 +27,7 @@ const TeamsTable = ({ data, columns, setTargetTeamName, setTargetTeamIndex , ope
 
   const handleTeamDepositEdit = (teamName, rowIndex) => {
     setTargetTeamName(teamName);
-    setTargetTeamIndex(rowIndex);
+    setTargetTeamIndex(data[rowIndex].originalIndex);
     openTeamDepositModal();
   }
 
