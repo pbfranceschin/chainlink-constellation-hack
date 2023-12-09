@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import mumbaiAaveApi from "../deployments/mumbai/AaveAPI.json";
 import mockAsset from "../artifacts/contracts/test/MockAsset.sol/MockAsset.json";
-import { mumbaiTestUSDC } from "../test/addresses";
+import { mumbaiTestUSDC, mumbaiUSDCPool } from "../test/addresses";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -30,7 +30,9 @@ const account = async() => {
   const signer = new ethers.Wallet(PRIVATE_KEY, provider);
   const token = new ethers.Contract(ASSET, mockAsset.abi, provider);
   let bal = await token.balanceOf(signer.address);
+  const allowance = await token.allowance(signer.address, mumbaiUSDCPool );
   console.log(`token balance: ${bal}`);
+  console.log('allowance', allowance);
 }
 
 account().catch(error => {

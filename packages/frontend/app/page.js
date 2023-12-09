@@ -18,8 +18,11 @@ import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawT
 import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
-import { privateKeyToAccount } from 'viem/accounts';
 import { useSponsor } from "./hooks/writes";
+import { useAccount } from "wagmi";
+import { useAllowance, useApprove } from "./hooks/asset";
+
+import { mumbaiTestUSDC } from "@/blockchain/addresses/testnet";
 
 // const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
 // const account = privateKeyToAccount(pkey2);
@@ -57,6 +60,10 @@ const useUserPrize = 10
 const useDaysLeft = 10
 const POOL_ADDRESS = mumbaiUSDCPool;
 
+// FAZER UM HOOK useAsset !!!!!!!!!!!!!!!!!!!!!!!!!!
+const ASSET_ADDRESS = mumbaiTestUSDC;
+// // // // // // // // // // // // 
+
 export default function Home() {
   /* State management */
   const [teamTableData, setTeamTableData] = useState(useTeamData)
@@ -69,8 +76,15 @@ export default function Home() {
   const [userPrize, setUserPrize] = useState(useUserPrize);
   // const [daysLeft, setDaysLeft] = useState(useDaysLeft);
   const hasResult = useHasResult(POOL_ADDRESS);
-  const TVL = useTVL(POOL_ADDRESS);
   // const hasResult = {data: true};
+  const TVL = useTVL(POOL_ADDRESS);
+
+  const { address } = useAccount();
+  const { data: allowance } = useAllowance(
+    address,
+    ASSET_ADDRESS,
+    POOL_ADDRESS
+  );
 
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
@@ -126,13 +140,15 @@ export default function Home() {
   }
 
   /* handlers */
-  const handleSponsor = useSponsor(POOL_ADDRESS);
+  const sponsor = useSponsor(POOL_ADDRESS, setIsSponsorDepositModalOpen);
+  const approve = useApprove(ASSET_ADDRESS, POOL_ADDRESS);
   
   /* Variables */
   const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
   const userSponsorAmount = getUserSponsorData();
   
   // console.log('handleSponsor', handleSponsor);
+  // console.log('walletClient', walletClient);
 
   return (
     <section className="w-full main-section bg-background2 relative">
@@ -160,10 +176,13 @@ export default function Home() {
       }
       {isSponsorDepositModalOpen &&
         <Modal 
-          onClose={closeSponsorDepositModal} 
+          // onClose={closeSponsorDepositModal}
           targetName={tournamentName}
           currentUserAmount={getUserSponsorData()}
-          setCurrentUserAmount={(amount) => handleSponsor.write({args:[amount]})}
+          handleDeposit={(amount) => sponsor.write({args:[amount]})}
+          handleApprove={() => approve.write()}
+          isLoading={ approve.isLoading || sponsor.isLoading }
+          allowance={allowance}
           depositText={sponsorDepositText(tournamentName, getUserSponsorData())}
           withdrawText={sponsorWithdrawText(tournamentName, getUserSponsorData())}
         />
