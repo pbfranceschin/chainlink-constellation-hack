@@ -15,7 +15,7 @@ import Button from "./components/Button";
 import Logo from "./components/Logo"
 import LogoName from "./components/LogoName"
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
-import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield } from "./hooks/pool";
+import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 import { privateKeyToAccount } from 'viem/accounts' 
@@ -38,12 +38,13 @@ import { privateKeyToAccount } from 'viem/accounts'
   { col1: 'Napoli', col2: '0', col3: '0', col4: '0', col5: '0' },
 ];
 
+const ASSET = 'USDC';
 const columns = [
   { header: 'Team', accessor: 'col1' },
-  { header: 'Total deposit (USDC)', accessor: 'col2' },
-  { header: 'Total yield (USDC)', accessor: 'col3' },
-  { header: 'Your deposit (USDC)', accessor: 'col4' },
-  { header: 'Your yield (USDC)', accessor: 'col5' },
+  { header: `Total deposit (${ASSET})`, accessor: 'col2' },
+  { header: `Total yield (${ASSET})`, accessor: 'col3' },
+  { header: `Your deposit (${ASSET})`, accessor: 'col4' },
+  { header: `Your yield (${ASSET})`, accessor: 'col5' },
 ];
 
 const useSponsorData = [
@@ -53,6 +54,7 @@ const useSponsorData = [
 const useWinnerData = 'Dortmund'
 const useUserPrize = 10
 const useDaysLeft = 10
+const POOL_ADDRESS = mumbaiUSDCPool;
 
 export default function Home() {
   /* State management */
@@ -64,7 +66,10 @@ export default function Home() {
   const [tournamentName, setTournamentName] = useState('UEFA Champions League 2023');
   const [winnerTeam, setWinnerTeam] = useState(useWinnerData);
   const [userPrize, setUserPrize] = useState(useUserPrize);
-  const [daysLeft, setDaysLeft] = useState(useDaysLeft);
+  // const [daysLeft, setDaysLeft] = useState(useDaysLeft);
+  const hasResult = useHasResult(POOL_ADDRESS);
+  const TVL = useTVL(POOL_ADDRESS);
+  // const hasResult = {data: true};
 
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
@@ -135,9 +140,11 @@ export default function Home() {
   // console.log('yieldByOutcome', yieldByOutcome);
   // console.log('pkey', pkey2);
   // console.log('account', account.address);
+  // console.log('hasResult', hasResult.data);
+  // console.log('tvl', TVL);
 
   /* Variables */
-  const totalSponsorAmount = getTotalSponsorAmount();
+  const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
   const userSponsorAmount = getUserSponsorData();
 
   return (
@@ -182,7 +189,7 @@ export default function Home() {
             </h1>
           </div>
           {
-            daysLeft === 0 &&
+            hasResult.data &&
             <div className="w-full flex justify-center">
               <div className="py-6 px-9 rounded-3xl bg-background1 h-full w-0.7full flex flex-col gap-5 items-center place-content-between text-text2 text-center text-2xl">
                 <h2 className="mb-4 text-3xl">
@@ -194,7 +201,7 @@ export default function Home() {
                 {userPrize > 0 
                   ? <>
                       <h3>
-                        Your prize is <span className="text-text1 font-semibold">{userPrize} USDC.</span>
+                        Your prize is <span className="text-text1 font-semibold">{userPrize} {ASSET}.</span>
                       </h3>
                       <Button label={'WITHDRAW YOUR PRIZE'} isPrize={userPrize > 0}/>
                     </>
@@ -212,20 +219,21 @@ export default function Home() {
              <div className="py-6 px-9 rounded-3xl bg-background1">
                 <div className="flex flex-col items-center place-content-between h-full text-text2">
                   <h2 className="text-xl">
-                    This tournament ends in
+                    TVL
                   </h2>
                   <span className="text-4xl">
-                    {daysLeft} <span className="">days</span>
+                    {/* TVL */}
+                    {TVL.isLoading ? 'loading...' : TVL.data.toString()} <span className="text-2xl">{ASSET}</span>
                   </span>
                 </div>
               </div>
             <div className="py-6 px-9 rounded-3xl bg-background1 text-text2 ">
               <div className="flex flex-col items-left place-content-between h-full">
                 <div className="text-xl">
-                  Total sponsor amount
+                  Total sponsored
                 </div>
                 <div className="text-4xl">
-                  {totalSponsorAmount} <span className="text-2xl">USDC</span>
+                  {totalSponsorAmount.isLoading ? 'loading...' : totalSponsorAmount.data.toString()} <span className="text-2xl">{ASSET}</span>
                 </div>
               </div>
             </div>
@@ -240,17 +248,17 @@ export default function Home() {
                   {userSponsorAmount > 0 
                     ? <div className="flex gap-3 items-end text-4xl">
                         {userSponsorAmount} 
-                        <span className="text-2xl"> USDC</span>
+                        <span className="text-2xl"> {ASSET}</span>
                         <div className="pl-2 place-self-center">
                           <EditIcon handleOnClick={handleSponsorDepositEdit} size={32}/>
                         </div>
                       </div>
-                    : <Button label={'DEPOSIT'} handleOnClick={openSponsorDepositModal} isActive={daysLeft > 0} />} 
+                    : <Button label={'DEPOSIT'} handleOnClick={openSponsorDepositModal} isActive={!hasResult.data} />} 
                 </div>
               </div>
             </div>
           </div>
-          <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} openTeamDepositModal={openTeamDepositModal} isTournamentEnd={daysLeft === 0}/>
+          <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} openTeamDepositModal={openTeamDepositModal} isTournamentEnd={hasResult.data}/>
         </div>
       </main>
     </section>

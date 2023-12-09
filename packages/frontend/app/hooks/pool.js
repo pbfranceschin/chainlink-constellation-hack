@@ -4,11 +4,11 @@ import pool  from "../../blockchain/contracts/artifacts/Pool.json";
 import api from "../../blockchain/contracts/mumbai/AaveAPI.json";
 import { convertToAssets, getApiAddress } from "../utils";
 
-export function useTVL() {
+export function useTVL(poolAddress) {
   const { data, isError, isLoading } = useContractRead({
-    address: api.address,
-    abi: api.abi,
-    functionName: 'totalAssets',
+    address: poolAddress,
+    abi: pool.abi,
+    functionName: 'getTVL',
     chainId: 80001,
     watch: true
   });
@@ -151,3 +151,15 @@ export function useYieldByOutcome(outcome, poolAddress) {
   }, [poolAddress, stake, shares]);
   return { ret, isLoading, error }
 }
+
+export function useHasResult(poolAddress) {
+ const { data, isError, isLoading } = useContractRead({
+    address: poolAddress,
+    abi: pool.abi,
+    functionName: 'hasResult',
+    chainId: 80001,
+    watch: true
+  });
+  return { data, isError, isLoading };   
+}
+
