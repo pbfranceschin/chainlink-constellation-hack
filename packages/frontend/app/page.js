@@ -18,7 +18,8 @@ import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawT
 import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
-import { privateKeyToAccount } from 'viem/accounts' 
+import { privateKeyToAccount } from 'viem/accounts';
+import { useSponsor } from "./hooks/writes";
 
 // const pkey2 = `0x${process.env.NEXT_PUBLIC_PRIVATE_KEY_2}`;
 // const account = privateKeyToAccount(pkey2);
@@ -79,15 +80,17 @@ export default function Home() {
   const handleSponsorDepositEdit = () => {
     openSponsorDepositModal()
   }
-  const updateSponsorData = (targetTournament, amount) => {
-    let newSponsorData = [...sponsorData]
-    newSponsorData.map((tournament) => {
-      if (tournament.name === targetTournament) {
-        tournament.totalAmount = tournament.totalAmount + amount
-        tournament.userAmount = tournament.userAmount + amount
-    }})
-    setSponsorData(newSponsorData)
-  }
+  // const updateSponsorData = (targetTournament, amount) => {
+  //   let newSponsorData = [...sponsorData]
+  //   newSponsorData.map((tournament) => {
+  //     if (tournament.name === targetTournament) {
+  //       tournament.totalAmount = tournament.totalAmount + amount
+  //       tournament.userAmount = tournament.userAmount + amount
+  //   }})
+  //   setSponsorData(newSponsorData)
+  // }
+
+  
   const updateTeamTableData = (targetTeam, amount) => {
     let newTeamTableData = [...teamTableData]
     newTeamTableData.map((row) => {
@@ -121,31 +124,15 @@ export default function Home() {
     })
     return currentUserDepositAmount
   }
-  // const tvl = useTVL();
-  // const totalYield = useTotalYield(mumbaiUSDCPool);
-  // const indYield = useIndividualYield(account.address, 1, mumbaiUSDCPool);
-  // const yieldByOutcome = useYieldByOutcome(1, mumbaiUSDCPool);
 
-  // // useEffect(() => {
-  // //   const resolveApi = async() => {
-  // //     setApi(await getApiAddress(mumbaiUSDCPool));
-  // //   }
-  // //   resolveApi();
-  // // })
-
-  // // console.log('api', api);
-  // console.log('indYield', indYield);
-  // console.log('tvl',tvl);
-  // console.log('totalYield', totalYield);
-  // console.log('yieldByOutcome', yieldByOutcome);
-  // console.log('pkey', pkey2);
-  // console.log('account', account.address);
-  // console.log('hasResult', hasResult.data);
-  // console.log('tvl', TVL);
-
+  /* handlers */
+  const handleSponsor = useSponsor(POOL_ADDRESS);
+  
   /* Variables */
   const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
   const userSponsorAmount = getUserSponsorData();
+  
+  // console.log('handleSponsor', handleSponsor);
 
   return (
     <section className="w-full main-section bg-background2 relative">
@@ -176,7 +163,7 @@ export default function Home() {
           onClose={closeSponsorDepositModal} 
           targetName={tournamentName}
           currentUserAmount={getUserSponsorData()}
-          setCurrentUserAmount={(amount) => updateSponsorData(tournamentName, amount)}
+          setCurrentUserAmount={(amount) => handleSponsor.write({args:[amount]})}
           depositText={sponsorDepositText(tournamentName, getUserSponsorData())}
           withdrawText={sponsorWithdrawText(tournamentName, getUserSponsorData())}
         />
