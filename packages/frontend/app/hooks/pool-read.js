@@ -4,7 +4,7 @@ import pool  from "../../blockchain/contracts/artifacts/Pool.json";
 import controllerArtifact  from "../../blockchain/contracts/artifacts/IResultController.json";
 import api from "../../blockchain/contracts/mumbai/AaveAPI.json";
 import { convertToAssets, getApiAddress } from "../utils";
-import { hexToString } from 'viem'
+import { hexToString, formatUnits } from 'viem'
 import IERC4626 from "../../blockchain/interfaces/IERC4626.json"
 import { formatBigInt } from "../utils";
 
@@ -233,7 +233,8 @@ export function useYieldMultiplier (poolAddress, row) {
   ) {
     return undefined;
   }
-  return totalPoolYield / totalOutcomeYield;
+  const decimalRet = (totalPoolYield * BigInt(100)) / totalOutcomeYield;
+  return formatUnits(decimalRet, 2);
 }
 
 function getTeamTableRow (poolAddress, userAddress, row) {
