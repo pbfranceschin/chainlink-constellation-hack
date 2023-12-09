@@ -8,5 +8,5 @@ export const mumbaiTestUSDC = '0x52D800ca262522580CeBAD275395ca6e7598C014';
 //
 
 // internals
-export const mumbaiUSDCPool = '0x5Bb118F6aed7a12A1E264Ef5f07228604e438e6c';
+export const mumbaiUSDCPool = '0x20DdD7682759Be0C36EC995Dff7f7c0d7D3AC9c5';
 

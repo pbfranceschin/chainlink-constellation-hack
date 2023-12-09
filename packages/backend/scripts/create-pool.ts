@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import factoryMumbai from "../deployments/mumbai/Factory.json";
-import resultControllerMumbai from "../deployments/mumbai/MockController.json";
+import resultControllerMumbai from "../deployments/mumbai/MockControllerFunction.json";
 import aaveApiMumbai from "../deployments/mumbai/AaveAPI.json";
 import { mumbaiTestUSDC } from "../test/addresses";
 import dotenv from "dotenv";

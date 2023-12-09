@@ -52,7 +52,7 @@ const useSponsorData = [
 ]
 const useWinnerData = 'Dortmund'
 const useUserPrize = 10
-const useDaysLeft = 0
+const useDaysLeft = 10
 
 export default function Home() {
   /* State management */
@@ -128,7 +128,7 @@ export default function Home() {
   //   resolveApi();
   // })
 
-  console.log('api', api);
+  // console.log('api', api);
   console.log('indYield', indYield);
   console.log('tvl',tvl);
   console.log('totalYield', totalYield);
