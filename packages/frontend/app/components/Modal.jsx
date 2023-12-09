@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NumericInput from './NumericInput';
 import Button from './Button';
+import { convertToBigInt, formatBigInt } from '../utils';
 
 const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handleWithdraw, depositText, withdrawText, allowance, isLoading}) => {
   const [activeTab, setActiveTab] = useState('deposit');
@@ -20,11 +21,12 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
     handleWithdraw(currentInputValue)
     // onClose()
   }
+
+  const numericInputSetValue = (value) => {
+    setCurrentInputValue(convertToBigInt(value));
+  }
   
-  // console.log('allowance', allowance, currentInputValue, BigInt(currentInputValue) >= allowance);
-  // console.log('isLoading', isLoading);
-  // console.log('currentUserAmount', currentUserAmount)
-  console.log('currentInputValue', currentInputValue)
+  const decimalUserAmount = currentUserAmount !== undefined ? Number(formatBigInt(currentUserAmount)) : 0;
 
   return (
     <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 backdrop-filter backdrop-blur-sm flex justify-center items-center p-4 z-10 text-text1" onClick={handleClose}>
@@ -48,12 +50,12 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
             &times;
           </button>
           {activeTab === 'deposit' && 
-            <div className={`w-full flex flex-col ${currentUserAmount > 0 ? 'gap-72px' : 'gap-8'}`}>
-              {currentUserAmount > 0 
+            <div className={`w-full flex flex-col ${decimalUserAmount > 0 ? 'gap-72px' : 'gap-8'}`}>
+              {decimalUserAmount > 0 
                 ? depositText.textPositiveAmount
                 : depositText.textZeroAmount
               }
-              <NumericInput setCurrentInputValue={setCurrentInputValue}/>
+              <NumericInput setCurrentInputValue={numericInputSetValue}/>
               {isLoading
                 ? <Button label={'LOADING...'} handleOnClick={handleSubmitDeposit} isActive={false}/>
                 : (BigInt(currentInputValue) <= allowance && allowance > 0)
@@ -64,15 +66,15 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
           }
           {activeTab === 'withdraw' && 
             <div className="w-full flex flex-col gap-8">
-              {currentUserAmount > 0 
+              {decimalUserAmount > 0 
                 ? withdrawText.textPositiveAmount
                 : withdrawText.textZeroAmount
               }
-              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > 0} />
-              {currentUserAmount > 0 && currentInputValue &&
+              <NumericInput setCurrentInputValue={numericInputSetValue} initialValue={decimalUserAmount} isActive={decimalUserAmount > 0} />
+              {decimalUserAmount > 0 && currentInputValue &&
                 <p className="text-lg text-text4">
-                  Value to withdraw: <span className="font-semibold text-text2">{currentInputValue.toString()} USDC</span> <br />
-                  Remaining amount after withdraw: <span className="font-semibold text-text2">{(currentUserAmount - currentInputValue).toString()} USDC</span>
+                  Value to withdraw: <span className="font-semibold text-text2">{formatBigInt(currentInputValue)} USDC</span> <br />
+                  Remaining amount after withdraw: <span className="font-semibold text-text2">{formatBigInt(currentUserAmount - currentInputValue)} USDC</span>
                 </p>
               }
               {isLoading

@@ -1,7 +1,12 @@
 import pool from "../blockchain/contracts/artifacts/Pool.json";
 import IERC4626 from "../blockchain/interfaces/IERC4626.json"
 import { polygonMumbai } from "viem/chains";
-import { createPublicClient, http, formatUnits } from 'viem'
+import { 
+  createPublicClient,
+  http,
+  formatUnits,
+  parseUnits,
+} from 'viem'
 
 export const publicClient = createPublicClient({
   chain: polygonMumbai,
@@ -33,4 +38,8 @@ export function formatBigInt (n, decimalPlaces) {
   }
   const formated = formatUnits(n, 6);
   return formated;
+}
+
+export function convertToBigInt (n) {
+  return parseUnits(n.toString(), 6);
 }

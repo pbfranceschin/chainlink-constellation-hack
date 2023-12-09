@@ -8,10 +8,8 @@ const NumericInput = ({ setCurrentInputValue, initialValue='', isActive=true }) 
       setValue('');
       setCurrentInputValue(0);
     } else {
-      console.log('else', targetValue)
       setValue(targetValue);
-      const numericValue = BigInt(targetValue) > 0 ? BigInt(targetValue) : 0;
-      setCurrentInputValue(numericValue);
+      setCurrentInputValue(Number(targetValue));
     }
   }
 
