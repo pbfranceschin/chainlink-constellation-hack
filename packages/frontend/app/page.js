@@ -47,7 +47,7 @@ const ASSET = 'USDC';
 const columns = [
   { header: 'Team', accessor: 'col1' },
   { header: `Total deposit (${ASSET})`, accessor: 'col2' },
-  { header: `Total yield (${ASSET})`, accessor: 'col3' },
+  { header: `Yield multiplier`, accessor: 'col3' },
   { header: `Your deposit (${ASSET})`, accessor: 'col4' },
   { header: `Your yield (${ASSET})`, accessor: 'col5' },
 ];

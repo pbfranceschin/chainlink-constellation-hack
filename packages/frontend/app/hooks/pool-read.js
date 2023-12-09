@@ -223,17 +223,31 @@ function useTeamName (poolAddress, row) {
   return encodedTeamName ? hexToString(encodedTeamName) : '-';
 }
 
+export function useYieldMultiplier (poolAddress, row) {
+  const totalOutcomeYield = useYieldByOutcome(fixRow(row), poolAddress);
+  const { data: totalPoolYield } = useTotalYield(poolAddress);
+  if (
+    totalOutcomeYield === undefined ||
+    totalPoolYield === undefined ||
+    totalOutcomeYield == 0
+  ) {
+    return undefined;
+  }
+  return totalPoolYield / totalOutcomeYield;
+}
+
 function getTeamTableRow (poolAddress, userAddress, row) {
   const teamName = useTeamName(poolAddress, row);
   const { data: teamTotalDeposited } = useStakeByOutcome(fixRow(row), poolAddress);
-  const totalYield = useYieldByOutcome(fixRow(row), poolAddress);
+  const yieldMultiplier = useYieldMultiplier(poolAddress, row);
   const account = userAddress || "0x0000000000000000000000000000000000000000";
   const { data: userDeposit } = useStake(account, fixRow(row), poolAddress);
   const userYield = useIndividualYield(account, fixRow(row), poolAddress);
   return { 
     col1: teamName || '-',
     col2: formatBigInt(teamTotalDeposited),
-    col3: formatBigInt(totalYield),
+    // col3: formatBigInt(yieldMultiplier),
+    col3: yieldMultiplier !== undefined ? yieldMultiplier.toString() : '-',
     col4: formatBigInt(userDeposit),
     col5: formatBigInt(userYield), 
   };
