@@ -49,7 +49,7 @@ const columns = [
   { header: `Total deposit (${ASSET})`, accessor: 'col2' },
   { header: `Yield multiplier`, accessor: 'col3' },
   { header: `Your deposit (${ASSET})`, accessor: 'col4' },
-  { header: `Your yield (${ASSET})`, accessor: 'col5' },
+  { header: `Your prize (${ASSET})`, accessor: 'col5' },
 ];
 
 const useSponsorData = [

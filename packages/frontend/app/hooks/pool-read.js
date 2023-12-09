@@ -237,19 +237,34 @@ export function useYieldMultiplier (poolAddress, row) {
   return formatUnits(decimalRet, 2);
 }
 
+export function usePotentialPrize (poolAddress, userAddress, row) {
+  const userYield = useIndividualYield(userAddress, fixRow(row), poolAddress);
+  const totalOutcomeYield = useYieldByOutcome(fixRow(row), poolAddress);
+  const { data: totalPoolYield } = useTotalYield(poolAddress);
+  if (
+    userYield === undefined ||
+    totalOutcomeYield === undefined ||
+    totalPoolYield === undefined ||
+    totalOutcomeYield == 0
+  ) {
+    return undefined;
+  }
+  return (userYield * totalPoolYield) / totalOutcomeYield;
+}
+
 function getTeamTableRow (poolAddress, userAddress, row) {
   const teamName = useTeamName(poolAddress, row);
   const { data: teamTotalDeposited } = useStakeByOutcome(fixRow(row), poolAddress);
   const yieldMultiplier = useYieldMultiplier(poolAddress, row);
   const account = userAddress || "0x0000000000000000000000000000000000000000";
   const { data: userDeposit } = useStake(account, fixRow(row), poolAddress);
-  const userYield = useIndividualYield(account, fixRow(row), poolAddress);
+  const userPotentialPrize = usePotentialPrize(poolAddress, account, row);
   return { 
     col1: teamName || '-',
     col2: formatBigInt(teamTotalDeposited),
     col3: yieldMultiplier !== undefined ? yieldMultiplier.toString() : '-',
     col4: formatBigInt(userDeposit),
-    col5: formatBigInt(userYield), 
+    col5: formatBigInt(userPotentialPrize), 
     originalIndex: row,
   };
 }
