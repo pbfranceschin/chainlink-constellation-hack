@@ -91,7 +91,6 @@ export default function Home() {
     POOL_ADDRESS
   );
 
-  const { data: stake } = useStake(address, targetTeamIndex + 1, POOL_ADDRESS);
 
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
@@ -154,7 +153,8 @@ export default function Home() {
 
   /* Variables */
   const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
-  const userSponsorAmount = getUserSponsorData();
+  const userSponsorAmount = useSponsorship(address, POOL_ADDRESS);
+  const { data: stake } = useStake(address, targetTeamIndex + 1, POOL_ADDRESS);
   
   // console.log('handleSponsor', handleSponsor);
   // console.log('walletClient', walletClient);
@@ -260,20 +260,24 @@ export default function Home() {
             <div className="py-6 px-9 rounded-3xl bg-background1 text-text2 ">
               <div className="flex flex-col items-left gap-6">
                 <div className="text-xl">
-                  {userSponsorAmount > 0 
-                    ? 'Your sponsor amount'
-                    : 'Sponsor this tournament'}
+                  {userSponsorAmount.isLoading
+                    ? 'Loading...'
+                    : userSponsorAmount.data > 0 
+                      ? 'Your sponsor amount'
+                      : 'Sponsor this tournament'}
                 </div>
                 <div className="">
-                  {userSponsorAmount > 0 
-                    ? <div className="flex gap-3 items-end text-4xl">
-                        {userSponsorAmount} 
-                        <span className="text-2xl"> {ASSET}</span>
-                        <div className="pl-2 place-self-center">
-                          <EditIcon handleOnClick={handleSponsorDepositEdit} size={32}/>
+                  {!userSponsorAmount.isLoading && 
+                    (userSponsorAmount.data > 0 
+                      ? <div className="flex gap-3 items-end text-4xl">
+                        {userSponsorAmount.data.toString()} 
+                          <span className="text-2xl"> {ASSET}</span>
+                          <div className="pl-2 place-self-center">
+                            <EditIcon handleOnClick={handleSponsorDepositEdit} size={32}/>
+                          </div>
                         </div>
-                      </div>
-                    : <Button label={'DEPOSIT'} handleOnClick={openSponsorDepositModal} isActive={!hasResult.data} />} 
+                      : <Button label={'DEPOSIT'} handleOnClick={openSponsorDepositModal} isActive={!hasResult.data} />)
+                  } 
                 </div>
               </div>
             </div>
