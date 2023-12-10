@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import NumericInput from './NumericInput';
 import Button from './Button';
 
-const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, depositText, withdrawText, allowance, isLoading}) => {
+const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handleWithdraw, depositText, withdrawText, allowance, isLoading}) => {
   const [activeTab, setActiveTab] = useState('deposit');
-  const [currentInputValue, setCurrentInputValue] = useState(0)
+  const [currentInputValue, setCurrentInputValue] = useState(BigInt(0));
   
   const handleClose = (e) => {
     if (e.target.id === 'modal-overlay') {
@@ -17,12 +17,13 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, deposi
     // onClose()
   }
   const handleSubmitWithdraw = () => {
-    // setCurrentUserAmount(-currentInputValue)
-    onClose()
+    handleWithdraw(currentInputValue)
+    // onClose()
   }
   
   // console.log('allowance', allowance, currentInputValue, BigInt(currentInputValue) >= allowance);
   // console.log('isLoading', isLoading);
+  console.log('currentUserAmount', currentUserAmount)
 
   return (
     <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 backdrop-filter backdrop-blur-sm flex justify-center items-center p-4 z-10 text-text1" onClick={handleClose}>
@@ -66,14 +67,17 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, deposi
                 ? withdrawText.textPositiveAmount
                 : withdrawText.textZeroAmount
               }
-              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > 0 ? true : false} />
-              {currentUserAmount > 0 &&
+              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > BigInt(0)} />
+              {currentUserAmount > BigInt(0) &&
                 <p className="text-lg text-text4">
                   Value to withdraw: <span className="font-semibold text-text2">{currentInputValue} USDC</span> <br />
-                  Remaining amount after withdraw: <span className="font-semibold text-text2">{Math.max(0, currentUserAmount - currentInputValue)} USDC</span>
+                  Remaining amount after withdraw: <span className="font-semibold text-text2">{currentUserAmount - currentInputValue} USDC</span>
                 </p>
               }
-              <Button label={'WITHDRAW VALUE'} handleOnClick={handleSubmitWithdraw} isActive={currentUserAmount > 0 ? true : false}/>
+              {isLoading
+                ? <Button label={'LOADING...'} handleOnClick={handleSubmitDeposit} isActive={false}/>
+                : <Button label={'WITHDRAW VALUE'} handleOnClick={handleSubmitWithdraw} isActive={(currentUserAmount > 0 && currentInputValue <= currentUserAmount && currentInputValue > 0)}/>
+              }
             </div>
           }
         </div>

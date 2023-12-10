@@ -15,10 +15,10 @@ import Button from "./components/Button";
 import Logo from "./components/Logo"
 import LogoName from "./components/LogoName"
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
-import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool-read";
+import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship, useStake } from "./hooks/pool-read";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
-import { useSponsor, useStake } from "./hooks/pool-writes";
+import { useDeposit, useSponsor, useUnStake } from "./hooks/pool-writes";
 import { useAccount } from "wagmi";
 import { useAllowance, useApprove } from "./hooks/asset";
 
@@ -91,6 +91,8 @@ export default function Home() {
     POOL_ADDRESS
   );
 
+  const { data: stake } = useStake(address, targetTeamIndex + 1, POOL_ADDRESS);
+
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
   const closeTeamDepositModal = () => setIsTeamDepositModalOpen(false);
@@ -145,9 +147,10 @@ export default function Home() {
   }
 
   /* handlers */
-  const sponsor = useSponsor(POOL_ADDRESS, setIsSponsorDepositModalOpen);
-  const approve = useApprove(ASSET_ADDRESS, POOL_ADDRESS);
-  const stake = useStake(poolAddress, setIsTeamDepositModalOpen);
+  const sponsorCallback = useSponsor(POOL_ADDRESS, setIsSponsorDepositModalOpen);
+  const approveCallback = useApprove(ASSET_ADDRESS, POOL_ADDRESS);
+  const stakeCallback = useDeposit(poolAddress, setIsTeamDepositModalOpen);
+  const unStakeCallback = useUnStake(poolAddress, setIsTeamDepositModalOpen);
 
   /* Variables */
   const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
@@ -174,10 +177,11 @@ export default function Home() {
         <Modal
           onClose={closeTeamDepositModal} 
           targetTeam={targetTeamName}
-          currentUserAmount={getUserDepositAmount(teamTableData, targetTeamName)}
-          handleDeposit={(amount) => stake.write({args: [targetTeamIndex, amount]})}
-          handleApprove={() => approve.write()}
-          isLoading={approve.isLoading || stake.isLoading}
+          currentUserAmount={stake}
+          handleDeposit={(amount) => stakeCallback.write({args: [targetTeamIndex + 1, amount]})}
+          handleApprove={() => approveCallback.write()}
+          handleWithdraw={(amount) => unStakeCallback.write({args: [targetTeamIndex + 1, amount]})}
+          isLoading={approveCallback.isLoading || stakeCallback.isLoading || unStakeCallback.isLoading}
           allowance={allowance}
           // setCurrentUserAmount={(amount) => updateTeamTableData(targetTeamName, amount)}
           depositText={teamDepositText(targetTeamName, getUserDepositAmount(teamTableData, targetTeamName))}
@@ -189,9 +193,9 @@ export default function Home() {
           onClose={closeSponsorDepositModal}
           targetName={tournamentName}
           currentUserAmount={getUserSponsorData()}
-          handleDeposit={(amount) => sponsor.write({args:[amount]})}
-          handleApprove={() => approve.write()}
-          isLoading={ approve.isLoading || sponsor.isLoading }
+          handleDeposit={(amount) => sponsorCallback.write({args:[amount]})}
+          handleApprove={() => approveCallback.write()}
+          isLoading={ approveCallback.isLoading || sponsorCallback.isLoading }
           allowance={allowance}
           depositText={sponsorDepositText(tournamentName, getUserSponsorData())}
           withdrawText={sponsorWithdrawText(tournamentName, getUserSponsorData())}

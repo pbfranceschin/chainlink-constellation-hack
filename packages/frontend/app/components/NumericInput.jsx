@@ -6,10 +6,10 @@ const NumericInput = ({ setCurrentInputValue, initialValue='', isActive=true }) 
   const handleOnChange = (targetValue) => {
     if (targetValue === '') {
       setValue('');
-      setCurrentInputValue(0);
+      setCurrentInputValue(BigInt(0));
     } else {
-      setValue(targetValue);
-      const numericValue = Math.max(0, Number(targetValue));
+      setValue(BigInt(targetValue));
+      const numericValue = BigInt(targetValue) > BigInt(0) ? BigInt(targetValue) : BigInt(0);
       setCurrentInputValue(numericValue);
     }
   }
