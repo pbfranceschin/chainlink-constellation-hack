@@ -15,7 +15,7 @@ import Button from "./components/Button";
 import Logo from "./components/Logo"
 import LogoName from "./components/LogoName"
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
-import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool";
+import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
 import { useSponsor } from "./hooks/writes";
@@ -58,6 +58,8 @@ const useSponsorData = [
 const useWinnerData = 'Dortmund'
 const useUserPrize = 10
 const useDaysLeft = 10
+
+const poolAddress = mumbaiUSDCPool;
 const POOL_ADDRESS = mumbaiUSDCPool;
 
 // FAZER UM HOOK useAsset !!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -66,7 +68,7 @@ const ASSET_ADDRESS = mumbaiTestUSDC;
 
 export default function Home() {
   /* State management */
-  const [teamTableData, setTeamTableData] = useState(useTeamData)
+  // const [teamTableDataOld, setTeamTableData] = useState(useTeamData)
   const [sponsorData, setSponsorData] = useState(useSponsorData)
   const [isTeamDepositModalOpen, setIsTeamDepositModalOpen] = useState(false);
   const [isSponsorDepositModalOpen, setIsSponsorDepositModalOpen] = useState(false);
@@ -75,6 +77,8 @@ export default function Home() {
   const [winnerTeam, setWinnerTeam] = useState(useWinnerData);
   const [userPrize, setUserPrize] = useState(useUserPrize);
   // const [daysLeft, setDaysLeft] = useState(useDaysLeft);
+  const { accountAddress, isConnecting, isDisconnected } = useAccount()
+  const teamTableData = useTeamTableData(poolAddress, accountAddress);
   const hasResult = useHasResult(POOL_ADDRESS);
   // const hasResult = {data: true};
   const TVL = useTVL(POOL_ADDRESS);
@@ -106,14 +110,14 @@ export default function Home() {
 
   
   const updateTeamTableData = (targetTeam, amount) => {
-    let newTeamTableData = [...teamTableData]
-    newTeamTableData.map((row) => {
-      if (row.col1 === targetTeam) {
-        row.col2 = parseFloat(row.col2) + parseFloat(amount)
-        row.col4 = parseFloat(row.col4) + parseFloat(amount)
-      }
-    })
-    setTeamTableData(newTeamTableData)
+    // let newTeamTableData = [...teamTableData]
+    // newTeamTableData.map((row) => {
+    //   if (row.col1 === targetTeam) {
+    //     row.col2 = parseFloat(row.col2) + parseFloat(amount)
+    //     row.col4 = parseFloat(row.col4) + parseFloat(amount)
+    //   }
+    // })
+    // setTeamTableData(newTeamTableData)
   }
 
   /* Components */
