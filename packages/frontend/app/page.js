@@ -180,7 +180,7 @@ export default function Home() {
       }
       {isSponsorDepositModalOpen &&
         <Modal 
-          // onClose={closeSponsorDepositModal}
+          onClose={closeSponsorDepositModal}
           targetName={tournamentName}
           currentUserAmount={getUserSponsorData()}
           handleDeposit={(amount) => sponsor.write({args:[amount]})}
