@@ -15,10 +15,10 @@ import Button from "./components/Button";
 import Logo from "./components/Logo"
 import LogoName from "./components/LogoName"
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
-import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool";
+import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship } from "./hooks/pool-read";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
-import { useSponsor } from "./hooks/writes";
+import { useSponsor, useStake } from "./hooks/pool-writes";
 import { useAccount } from "wagmi";
 import { useAllowance, useApprove } from "./hooks/asset";
 
@@ -73,6 +73,7 @@ export default function Home() {
   const [isTeamDepositModalOpen, setIsTeamDepositModalOpen] = useState(false);
   const [isSponsorDepositModalOpen, setIsSponsorDepositModalOpen] = useState(false);
   const [targetTeamName, setTargetTeamName] = useState('');
+  const [targetTeamIndex, setTargetTeamIndex] = useState();
   const [tournamentName, setTournamentName] = useState('UEFA Champions League 2023');
   const [winnerTeam, setWinnerTeam] = useState(useWinnerData);
   const [userPrize, setUserPrize] = useState(useUserPrize);
@@ -146,7 +147,8 @@ export default function Home() {
   /* handlers */
   const sponsor = useSponsor(POOL_ADDRESS, setIsSponsorDepositModalOpen);
   const approve = useApprove(ASSET_ADDRESS, POOL_ADDRESS);
-  
+  const stake = useStake(poolAddress, setIsTeamDepositModalOpen);
+
   /* Variables */
   const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
   const userSponsorAmount = getUserSponsorData();
@@ -173,7 +175,11 @@ export default function Home() {
           onClose={closeTeamDepositModal} 
           targetTeam={targetTeamName}
           currentUserAmount={getUserDepositAmount(teamTableData, targetTeamName)}
-          setCurrentUserAmount={(amount) => updateTeamTableData(targetTeamName, amount)}
+          handleDeposit={(amount) => stake.write({args: [targetTeamIndex, amount]})}
+          handleApprove={() => approve.write()}
+          isLoading={approve.isLoading || sponsor.isLoading}
+          allowance={allowance}
+          // setCurrentUserAmount={(amount) => updateTeamTableData(targetTeamName, amount)}
           depositText={teamDepositText(targetTeamName, getUserDepositAmount(teamTableData, targetTeamName))}
           withdrawText={teamWithdrawText(targetTeamName, getUserDepositAmount(teamTableData, targetTeamName))}
         />
@@ -268,7 +274,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} openTeamDepositModal={openTeamDepositModal} isTournamentEnd={hasResult.data}/>
+          <TeamsTable data={teamTableData} columns={columns} setTargetTeamName={setTargetTeamName} setTargetTeamIndex={setTargetTeamIndex} openTeamDepositModal={openTeamDepositModal} isTournamentEnd={hasResult.data}/>
         </div>
       </main>
     </section>

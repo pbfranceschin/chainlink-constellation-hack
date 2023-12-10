@@ -12,3 +12,15 @@ export function useSponsor(poolAddress, setIsModalOpen) {
   });
   return { data, isLoading, isSuccess, error, write };
 }
+
+export function useStake(poolAddress, setIsModalOpen) {
+  const { data, isLoading, isSuccess, error, write } = useContractWrite({
+    address: poolAddress,
+    abi: pool.abi,
+    functionName: 'stake',
+    onSuccess() {
+      setIsModalOpen(false);
+    }
+  });
+  return { data, isLoading, isSuccess, error, write };
+}

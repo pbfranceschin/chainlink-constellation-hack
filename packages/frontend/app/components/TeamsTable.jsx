@@ -11,7 +11,7 @@ const SearchIcon = () => {
   )
 }
 
-const TeamsTable = ({ data, columns, setTargetTeamName, openTeamDepositModal, isTournamentEnd }) => {
+const TeamsTable = ({ data, columns, setTargetTeamName, setTargetTeamIndex , openTeamDepositModal, isTournamentEnd }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(data);
 
@@ -25,9 +25,10 @@ const TeamsTable = ({ data, columns, setTargetTeamName, openTeamDepositModal, is
     setFilteredData(filtered);
   }, [searchQuery, data, columns]);
 
-  const handleTeamDepositEdit = (teamName) => {
-    setTargetTeamName(teamName)
-    openTeamDepositModal()
+  const handleTeamDepositEdit = (teamName, rowIndex) => {
+    setTargetTeamName(teamName);
+    setTargetTeamIndex(rowIndex);
+    openTeamDepositModal();
   }
 
   
@@ -65,7 +66,7 @@ const TeamsTable = ({ data, columns, setTargetTeamName, openTeamDepositModal, is
                       {row[col.accessor]}
                       {isTournamentEnd 
                         ? <></>
-                        : <EditIcon handleOnClick={() => handleTeamDepositEdit(row['col1'])} />
+                        : <EditIcon handleOnClick={() => handleTeamDepositEdit(row['col1'], rowIndex)} />
                       }
                       
                     </div>
