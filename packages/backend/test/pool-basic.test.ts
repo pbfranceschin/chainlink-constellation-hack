@@ -4,7 +4,7 @@ import { Pool, MockAsset, MockVault, MockVaultAPI, MockController } from "../typ
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { makeOutcomes, deployAsset, deployPool, deployResultContr, deployVault, deployVaultAPI } from "./test-utils";
 
-describe.skip("Pool basic test", function () {
+describe("Pool basic test", function () {
   let pool: Pool, vApi: MockVaultAPI, resContr: MockController , asset:MockAsset, vault:MockVault;
   let assAddr: string, vaultAddr: string, vApiAddr: string, resContrAddr:string, poolAddr:string;
   let owner: SignerWithAddress, signer1: SignerWithAddress, signer2: SignerWithAddress, signer3: SignerWithAddress, signer4: SignerWithAddress;
@@ -50,9 +50,13 @@ describe.skip("Pool basic test", function () {
   });
 
   it("Should stake correctly", async function () {
-    await pool.connect(signer1).stake(1, 100);
+    const shares = await vApi.convertToShares(100);
+    const tx = await pool.connect(signer1).stake(1, 100);
+    const receipt = await tx.wait();
+    // console.log(receipt?.logs);
     expect(await pool.totalStakes()).to.equal(100);
     expect(await pool.getStake(signer1.address, 1)).to.equal(100);
+    expect(await pool.getShares(signer1.address, 1)).to.eq(shares);
   });
 
   // it("Should not allow staking when pool is closed", async function () {
@@ -61,10 +65,12 @@ describe.skip("Pool basic test", function () {
   // });
 
   it("Should sponsor correctly", async function () {
-    await pool.connect(signer1).sponsor(1e4);
-    expect(await pool.totalStakes()).to.equal(1e4);
-    expect(await pool.getStake(signer1.address, 0)).to.equal(1e4);
-    expect(await asset.balanceOf(vaultAddr)).to.eq(1e4);
+    const shares = await vApi.convertToShares(100);
+    await pool.connect(signer1).sponsor(100);
+    expect(await pool.totalStakes()).to.equal(100);
+    expect(await pool.getStake(signer1.address, 0)).to.equal(100);
+    expect(await asset.balanceOf(vaultAddr)).to.eq(100);
+    expect(await pool.getShares(signer1.address, 0)).to.eq(shares);
   });
 
   it("Should unStake correctly", async function () {
@@ -72,6 +78,13 @@ describe.skip("Pool basic test", function () {
     await pool.connect(signer1).unStake(1, 50);
     expect(await pool.getStake(signer1.address, 1)).to.equal(50);
     expect(await pool.totalStakes()).to.equal(50);
+  });
+
+  it("Should unStake sponsorship correctly", async () => {
+    await pool.connect(signer1).sponsor(1e4);
+    expect(await pool.totalStakes()).to.equal(1e4);
+    await pool.unStake(0, 100);
+    expect(await pool.getStake(signer1.address, 0)).to.eq(1e4 - 100);
   });
 
   it("Should not allow unstaking more than staked amount", async function () {

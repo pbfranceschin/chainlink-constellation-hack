@@ -90,13 +90,7 @@ contract Pool {
         require(asset.allowance(msg.sender, address(this)) >= amount, "Not enough allowance.");
         require(outcome < resultController.getOutcomesCount(), "Invalid pick");
 
-        asset.transferFrom(msg.sender, address(this), amount);
-        totalStakes += amount;
-        _stakes[msg.sender][outcome] += amount;
-        uint256 shares = vaultAPI.deposit(amount, address(this));
-        _sharesByOutcome[outcome] += shares;
-        _stakeByOutcome[outcome] += amount;
-        _shares[msg.sender][outcome] += shares;
+        _stake(msg.sender, outcome, amount);
 
         emit Staked(msg.sender, outcome, amount);
     }
@@ -109,13 +103,7 @@ contract Pool {
         require(amount <= maxDeposit(), "Amount too big.");
         require(asset.allowance(msg.sender, address(this)) >= amount, "Not enough allowance.");
 
-        asset.transferFrom(msg.sender, address(this), amount);
-        totalStakes += amount;
-        _stakes[msg.sender][0] += amount;
-        uint256 shares = vaultAPI.deposit(amount, address(this));
-        _sharesByOutcome[0] += shares;
-        _stakeByOutcome[0] += amount;
-        _shares[msg.sender][0] += amount;
+        _stake(msg.sender, 0, amount);
 
         emit Staked(msg.sender, 0, amount);
     }
@@ -128,28 +116,11 @@ contract Pool {
         require(amount <= _stakes[msg.sender][outcome], "Not enough stake, adjust amount.");
         require(amount <= maxWithdraw(msg.sender, outcome), "Amount too big.");
 
-        _stakes[msg.sender][outcome] -= amount;
-        totalStakes -= amount;
-        uint256 shares = vaultAPI.withdraw(amount, msg.sender, address(this));
-        _shares[msg.sender][outcome] -= shares;
-        _sharesByOutcome[outcome] -= shares;
-        _stakeByOutcome[outcome] -= amount;
+        _unStake(msg.sender, outcome, amount);
 
         emit UnStaked(msg.sender, outcome, amount);
     }
 
-    
-    /**
-     * metdodo close pool?
-	 *   -retira todos os fundos do vault
-	 *   -isOpen = false
-	 *  -restrito a resultController
-	 * PROBLEMA:
-	 *	-é preciso capturar os valores agregados do vault no momento do fechamento e calcular a preço na pool pra distrubuir o premio
-	 *	    -como o padrão é agnostico em relação a como as shares são precificadas, isso pode ser um problema pois poderia ter divergência
-     *      -
-     */
-    
     /**
      * closes pool and withdraws all assets from vault
      */
@@ -176,20 +147,50 @@ contract Pool {
         uint256 stake_ = _stakes[msg.sender][outcome];
         if(outcome == resultController.getResult()){ /**includes prize */
             uint256 prize = previewPrize(outcome, shares, stake_);
-            _shares[msg.sender][outcome] = 0;
-            totalStakes -= stake_;
+            _decreaseShares(msg.sender, outcome, shares);
+            _decreaseStake(msg.sender, outcome, stake_);
             vaultAPI.withdraw(prize + stake_, msg.sender, address(this));
-            yieldWithdrawn += prize;
-            _sharesByOutcome[outcome] -= shares;
-            _stakeByOutcome[outcome] -=stake_;
             emit Withdrawn(msg.sender, outcome, prize, stake_);
             return;
         }
-        _shares[msg.sender][outcome] = 0;
-        totalStakes -= stake_;
-        uint256 totAss = vaultAPI.totalAssets();
-        vaultAPI.withdraw(stake_ < totAss ? stake_ : totAss, msg.sender, address(this));
+        _unStake(msg.sender, outcome, stake_);
         emit Withdrawn(msg.sender, outcome, 0, stake_);
+    }
+ 
+    function _stake(address owner, uint16 outcome, uint256 amount) private {
+        asset.transferFrom(owner, address(this), amount);
+        _increaseStake(owner, outcome, amount);
+        uint256 shares = vaultAPI.deposit(amount, address(this));
+        _increaseShares(owner, outcome, shares);
+    }
+
+    function _unStake(address owner, uint16 outcome, uint256 amount) private {
+        _decreaseStake(owner, outcome, amount);
+        uint256 tvl = getTVL();
+        uint256 shares = vaultAPI.withdraw(amount < tvl ? amount : tvl, owner, address(this));
+        _decreaseShares(owner, outcome, shares);
+    }
+
+    function _increaseStake(address owner, uint16 outcome, uint256 amount) private {
+        totalStakes += amount;
+        _stakeByOutcome[outcome] += amount;
+        _stakes[owner][outcome] += amount;
+    }
+
+    function _decreaseStake(address owner, uint16 outcome, uint256 amount) private {
+        _stakes[owner][outcome] -= amount;
+        _stakeByOutcome[outcome] -= amount;
+        totalStakes -= amount;
+    }
+
+    function _increaseShares(address owner, uint16 outcome, uint256 shares) private {
+        _sharesByOutcome[outcome] += shares;
+        _shares[owner][outcome] += shares;
+    }
+
+    function _decreaseShares(address owner, uint16 outcome, uint256 shares) private {
+        _shares[owner][outcome] -= shares;
+        _sharesByOutcome[outcome] -= shares;
     }
 
     /**GETTERS */

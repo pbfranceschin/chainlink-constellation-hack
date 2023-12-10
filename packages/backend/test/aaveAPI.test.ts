@@ -4,7 +4,7 @@ import { Pool, MockAsset, MockAavePool, AaveAPI, MockController, MockAToken, Moc
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { makeOutcomes, deployAsset, deployPool, deployResultContr, deployMockAavePool, deployAaveAPI, deployMockAToken, deployMockAavePoolAddressProvider } from "./test-utils";
 
-describe.skip("Pool scenarios test w/ AaveAPI", function () {
+describe("Pool scenarios test w/ AaveAPI", function () {
     let pool: Pool, vApi: AaveAPI, resContr: MockController , asset:MockAsset, vault:MockAavePool, aToken: MockAToken, aaveAddressProvider: MockAavePoolAddressesProvider;
     let assAddr: string, vaultAddr: string, vApiAddr: string, resContrAddr:string, poolAddr:string, aTokenAddr: string;
     let signers: SignerWithAddress[];
@@ -70,7 +70,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
       await resContr.setOutcomes(outcomes); 
     });
 
-    it.skip("#1: equal split / 2 winners", async function () {
+    it("#1: equal split / 2 winners", async function () {
       await pool.connect(signers[0]).sponsor(1e10);
       await pool.connect(signers[1]).stake(1, 1e10);
       await pool.connect(signers[2]).stake(2, 1e10);
@@ -114,7 +114,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
       await pool.connect(signers[2]).withdraw(2);
       expect(await asset.balanceOf(signers[2].address)).to.eq(1e10);
     });
-    it.skip('#2: equal split / 20 winners', async() => {
+    it('#2: equal split / 20 winners', async() => {
     //   console.log('signers #:', signers.length)
     //   $10,000
       for(let i=5; i<signers.length; i++) {
@@ -155,7 +155,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
       bal = await asset.balanceOf(signers[0].address);
       expect(bal).to.eq(BigInt(2e10)+yield_/BigInt(20));
     });
-    it.skip('#3: equal stake different split: yield in between', async() => {
+    it('#3: equal stake different split: yield in between', async() => {
       const players = signers.length;
       for(let i=5; i<players; i++) {
         await asset.mint(signers[i].address, 1e10);
@@ -215,7 +215,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
         console.log(`balance of player ${i}: ${bal}`);
       }
     });
-    it.skip('#4: leave stake in the pool after closing', async() => {
+    it('#4: leave stake in the pool after closing', async() => {
       const players = signers.length;
       for(let i=5; i<players; i++) {
         await asset.mint(signers[i].address, 1e10);
@@ -290,7 +290,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
       bal = await vApi.totalAssets();
       console.log(`pool balance: ${bal}`);
     });
-    it.skip("#5: yield-leach attack", async() => {
+    it("#5: yield-leach attack", async() => {
         const players = signers.length;
         const stake = BigInt(1e10)
         for(let i=5; i<players; i++) {
@@ -356,7 +356,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
       //   expect(await asset.balanceOf(signers[0])).to.eq(stake+stake)
         expect(await vApi.totalAssets()).to.eq(0);
     });
-    it.skip("#6: lower tvl", async() => {
+    it("#6: lower tvl", async() => {
         for (let i=5; i<9; i++) {
             await asset.mint(signers[i], 25);
             await asset.connect(signers[i]).approve(poolAddr, ethers.MaxUint256);
@@ -399,7 +399,7 @@ describe.skip("Pool scenarios test w/ AaveAPI", function () {
         //   console.log('8 bal:', await asset.balanceOf(signers[8].address));
           expect(await asset.balanceOf(signers[8].address)).to.eq(25);
     });
-    it.skip("#7: low tvl", async() => {
+    it("#7: low tvl", async() => {
       for (let i=5; i<9; i++) {
         await asset.mint(signers[i], 225);
         await asset.connect(signers[i]).approve(poolAddr, ethers.MaxUint256);
