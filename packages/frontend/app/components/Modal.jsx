@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NumericInput from './NumericInput';
 import Button from './Button';
 
-const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, withdrawText}) => {
+const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, depositText, withdrawText, allowance, isLoading}) => {
   const [activeTab, setActiveTab] = useState('deposit');
   const [currentInputValue, setCurrentInputValue] = useState(0)
   
@@ -13,13 +13,16 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
   };
 
   const handleSubmitDeposit = () => {
-    setCurrentUserAmount(currentInputValue)
-    onClose()
+    handleDeposit(currentInputValue)
+    // onClose()
   }
   const handleSubmitWithdraw = () => {
-    setCurrentUserAmount(-currentInputValue)
+    // setCurrentUserAmount(-currentInputValue)
     onClose()
   }
+  
+  // console.log('allowance', allowance, currentInputValue, BigInt(currentInputValue) >= allowance);
+  console.log('isLoading', isLoading);
 
   return (
     <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 backdrop-filter backdrop-blur-sm flex justify-center items-center p-4 z-10 text-text1" onClick={handleClose}>
@@ -49,7 +52,12 @@ const Modal = ({onClose, currentUserAmount, setCurrentUserAmount, depositText, w
                 : depositText.textZeroAmount
               }
               <NumericInput setCurrentInputValue={setCurrentInputValue}/>
-              <Button label={'DEPOSIT VALUE'} handleOnClick={handleSubmitDeposit} />
+              {isLoading
+                ? <Button label={'LOADING...'} handleOnClick={handleSubmitDeposit} isActive={false}/>
+                : (BigInt(currentInputValue) <= allowance && allowance > 0)
+                  ? <Button label={'DEPOSIT VALUE'} handleOnClick={handleSubmitDeposit} />
+                  : <Button label={'APPROVE'} handleOnClick={handleApprove} />
+              }            
             </div>
           }
           {activeTab === 'withdraw' && 
