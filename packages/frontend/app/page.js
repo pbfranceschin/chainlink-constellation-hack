@@ -192,9 +192,10 @@ export default function Home() {
         <Modal 
           onClose={closeSponsorDepositModal}
           targetName={tournamentName}
-          currentUserAmount={getUserSponsorData()}
+          currentUserAmount={userSponsorAmount.data}
           handleDeposit={(amount) => sponsorCallback.write({args:[amount]})}
           handleApprove={() => approveCallback.write()}
+          handleWithdraw={(amount) => unStakeCallback.write({args: [0, amount]})}
           isLoading={ approveCallback.isLoading || sponsorCallback.isLoading }
           allowance={allowance}
           depositText={sponsorDepositText(tournamentName, getUserSponsorData())}

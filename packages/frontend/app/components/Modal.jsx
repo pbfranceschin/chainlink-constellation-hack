@@ -23,7 +23,8 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
   
   // console.log('allowance', allowance, currentInputValue, BigInt(currentInputValue) >= allowance);
   // console.log('isLoading', isLoading);
-  console.log('currentUserAmount', currentUserAmount)
+  // console.log('currentUserAmount', currentUserAmount)
+  console.log('currentInputValue', currentInputValue)
 
   return (
     <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 backdrop-filter backdrop-blur-sm flex justify-center items-center p-4 z-10 text-text1" onClick={handleClose}>
@@ -67,8 +68,8 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
                 ? withdrawText.textPositiveAmount
                 : withdrawText.textZeroAmount
               }
-              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > BigInt(0)} />
-              {currentUserAmount > BigInt(0) &&
+              <NumericInput setCurrentInputValue={setCurrentInputValue} initialValue={currentUserAmount} isActive={currentUserAmount > 0} />
+              {currentUserAmount > 0 && currentInputValue &&
                 <p className="text-lg text-text4">
                   Value to withdraw: <span className="font-semibold text-text2">{currentInputValue} USDC</span> <br />
                   Remaining amount after withdraw: <span className="font-semibold text-text2">{currentUserAmount - currentInputValue} USDC</span>
