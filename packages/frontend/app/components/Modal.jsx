@@ -22,7 +22,7 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, deposi
   }
   
   // console.log('allowance', allowance, currentInputValue, BigInt(currentInputValue) >= allowance);
-  console.log('isLoading', isLoading);
+  // console.log('isLoading', isLoading);
 
   return (
     <div id="modal-overlay" className="fixed inset-0 bg-[#000] bg-opacity-60 backdrop-filter backdrop-blur-sm flex justify-center items-center p-4 z-10 text-text1" onClick={handleClose}>

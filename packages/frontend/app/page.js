@@ -177,7 +177,7 @@ export default function Home() {
           currentUserAmount={getUserDepositAmount(teamTableData, targetTeamName)}
           handleDeposit={(amount) => stake.write({args: [targetTeamIndex, amount]})}
           handleApprove={() => approve.write()}
-          isLoading={approve.isLoading || sponsor.isLoading}
+          isLoading={approve.isLoading || stake.isLoading}
           allowance={allowance}
           // setCurrentUserAmount={(amount) => updateTeamTableData(targetTeamName, amount)}
           depositText={teamDepositText(targetTeamName, getUserDepositAmount(teamTableData, targetTeamName))}
