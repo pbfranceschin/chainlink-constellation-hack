@@ -15,10 +15,10 @@ import Button from "./components/Button";
 import Logo from "./components/Logo"
 import LogoName from "./components/LogoName"
 import { sponsorDepositText, sponsorWithdrawText, teamDepositText, teamWithdrawText} from './components/utils'
-import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship, useStake } from "./hooks/pool-read";
+import { useYieldByOutcome, useIndividualYield, useTVL, useTotalYield, usePoolController, useTeamCount, useTeamTableData, useHasResult, useSponsorship, useStakeByOutcome, useTotalSponsorship, useStake, usePotentialPrize } from "./hooks/pool-read";
 import { getApiAddress } from "./utils";
 import { mumbaiUSDCPool } from "@/blockchain/addresses/testnet";
-import { useDeposit, useSponsor, useUnStake } from "./hooks/pool-writes";
+import { useWithdraw, useDeposit, useSponsor, useUnStake } from "./hooks/pool-writes";
 import { useAccount } from "wagmi";
 import { useAllowance, useApprove } from "./hooks/asset";
 import { formatBigInt } from "./utils";
@@ -56,7 +56,7 @@ const useSponsorData = [
   {name: 'UEFA Champions League 2023', totalAmount: 10, userAmount: 0},
   {name: 'blablabal', totalAmount: 2, userAmount: 0.1}
 ]
-const useWinnerData = 'Dortmund'
+const useWinnerData = 'Paris Saint-Germain'
 const useUserPrize = 10
 const useDaysLeft = 10
 
@@ -84,6 +84,9 @@ export default function Home() {
   const hasResult = useHasResult(POOL_ADDRESS);
   // const hasResult = {data: true};
   const TVL = useTVL(POOL_ADDRESS);
+  
+  // 
+  
 
   const { address } = useAccount();
   const { data: allowance } = useAllowance(
@@ -92,6 +95,7 @@ export default function Home() {
     POOL_ADDRESS
   );
 
+  const winnerPrize = usePotentialPrize(poolAddress, address, 5);
   
   /* Auxiliary functions */
   const openTeamDepositModal = () => setIsTeamDepositModalOpen(true);
@@ -151,6 +155,7 @@ export default function Home() {
   const approveCallback = useApprove(ASSET_ADDRESS, POOL_ADDRESS);
   const stakeCallback = useDeposit(poolAddress, setIsTeamDepositModalOpen);
   const unStakeCallback = useUnStake(poolAddress, setIsTeamDepositModalOpen);
+  const withdrawCallback = useWithdraw(poolAddress);
 
   /* Variables */
   const totalSponsorAmount = useTotalSponsorship(POOL_ADDRESS);
@@ -176,12 +181,14 @@ export default function Home() {
       </header>
       {isTeamDepositModalOpen &&
         <Modal
+          hasResult={hasResult.data}
           onClose={closeTeamDepositModal} 
           targetTeam={targetTeamName}
           currentUserAmount={stake}
           handleDeposit={(amount) => stakeCallback.write({args: [targetTeamIndex + 1, amount]})}
           handleApprove={() => approveCallback.write()}
           handleWithdraw={(amount) => unStakeCallback.write({args: [targetTeamIndex + 1, amount]})}
+          handleWithdrawFinal={() => withdrawCallback.write({args:[targetTeamIndex + 1]})}
           isLoading={approveCallback.isLoading || stakeCallback.isLoading || unStakeCallback.isLoading}
           allowance={allowance}
           // setCurrentUserAmount={(amount) => updateTeamTableData(targetTeamName, amount)}
@@ -223,9 +230,9 @@ export default function Home() {
                 {userPrize > 0 
                   ? <>
                       <h3>
-                        Your prize is <span className="text-text1 font-semibold">{userPrize} {ASSET}.</span>
+                        Your prize is <span className="text-text1 font-semibold">{formatBigInt(winnerPrize)} {ASSET}.</span>
                       </h3>
-                      <Button label={'WITHDRAW YOUR PRIZE'} isPrize={userPrize > 0}/>
+                      <Button label={withdrawCallback.isLoading? 'LOADING...' : 'WITHDRAW YOUR PRIZE'} isActive={!withdrawCallback.isLoading} handleOnClick={() => withdrawCallback.write({args:[5]})} isPrize={userPrize > 0}/>
                     </>
                   : <>
                       <h3>

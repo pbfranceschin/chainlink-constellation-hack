@@ -3,7 +3,7 @@ import NumericInput from './NumericInput';
 import Button from './Button';
 import { convertToBigInt, formatBigInt } from '../utils';
 
-const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handleWithdraw, depositText, withdrawText, allowance, isLoading}) => {
+const Modal = ({hasResult, onClose, currentUserAmount, handleDeposit, handleApprove, handleWithdraw, handleWithdrawFinal, depositText, withdrawText, allowance, isLoading}) => {
   const [activeTab, setActiveTab] = useState('deposit');
   const [currentInputValue, setCurrentInputValue] = useState(BigInt(0));
   
@@ -18,7 +18,8 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
     // onClose()
   }
   const handleSubmitWithdraw = () => {
-    handleWithdraw(currentInputValue)
+    if(hasResult) handleWithdrawFinal();
+    else handleWithdraw(currentInputValue);
     // onClose()
   }
 
@@ -59,7 +60,7 @@ const Modal = ({onClose, currentUserAmount, handleDeposit, handleApprove, handle
               {isLoading
                 ? <Button label={'LOADING...'} handleOnClick={handleSubmitDeposit} isActive={false}/>
                 : (BigInt(currentInputValue) <= allowance && allowance > 0)
-                  ? <Button label={'DEPOSIT VALUE'} handleOnClick={handleSubmitDeposit} />
+                  ? <Button label={'DEPOSIT VALUE'} handleOnClick={handleSubmitDeposit} isActive={!hasResult} />
                   : <Button label={'APPROVE'} handleOnClick={handleApprove} />
               }            
             </div>

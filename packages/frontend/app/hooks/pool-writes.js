@@ -36,3 +36,15 @@ export function useUnStake(poolAddress, setIsModalOpen) {
   });
   return { data, isLoading, isSuccess, error, write };
 }
+
+export function useWithdraw(poolAddress, setIsModalOpen) {
+  const { data, isLoading, isSuccess, error, write } = useContractWrite({
+    address: poolAddress,
+    abi: pool.abi,
+    functionName: 'withdraw',
+    onSuccess() {
+      setIsModalOpen(false);
+    }
+  });
+  return { data, isLoading, isSuccess, error, write };
+}

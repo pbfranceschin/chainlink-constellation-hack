@@ -1,5 +1,10 @@
 # Chainlink Constellation Hackathon
 
+<!-- <p align="center">
+  <svg 
+   src="https://github.com/pbfranceschin/chainlink-constellation-hack/blob/master/packages/frontend/assets/logo.svg" alt="Sublime's custom image" />
+</p> -->
+
 # Yield Leagues
 Yield Leagues is a smart contract protocol that implements(introduces) the concept of "lossless betting pools". They are betting pools in which none of the losers lose the amount they put in. To enable this feature the protocol uses yield generating DeFi stategies and distributes the ROI to the game winners. The risk off course is proportional to the DeFi strategy being used. 
 

@@ -64,11 +64,7 @@ const TeamsTable = ({ data, columns, setTargetTeamName, setTargetTeamIndex , ope
                 col.accessor === 'col4'
                   ? <div key={colIndex} className={`py-5 px-10 flex-grow border-b border-text3 flex flex-row gap-3 place-content-center`}>
                       {row[col.accessor]}
-                      {isTournamentEnd 
-                        ? <></>
-                        : <EditIcon handleOnClick={() => handleTeamDepositEdit(row['col1'], rowIndex)} />
-                      }
-                      
+                      <EditIcon handleOnClick={() => handleTeamDepositEdit(row['col1'], rowIndex)} />
                     </div>
                   : <div key={colIndex} className={`py-5 px-10 border-b border-text3 ${col.accessor === 'col1' ? 'text-left' : 'text-center'}`}>
                       {row[col.accessor]}
